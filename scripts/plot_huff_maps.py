@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Generate map outputs from a station_huff_coefficients.csv file."""
 
-from __future__ import annotations
-
 import argparse
 import sys
 from pathlib import Path

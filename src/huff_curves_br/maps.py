@@ -1,11 +1,10 @@
 """Map outputs for station-level Huff results."""
 
-from __future__ import annotations
-
 import os
 import tempfile
 import warnings
 from pathlib import Path
+from typing import Dict, Optional, Union
 
 os.environ.setdefault("MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "huff_curves_br_mpl"))
 
@@ -24,13 +23,13 @@ DOMINANT_QUARTILE_COLORS = {
 }
 
 
-def _read_results(results: str | Path | pd.DataFrame) -> pd.DataFrame:
+def _read_results(results: Union[str, Path, pd.DataFrame]) -> pd.DataFrame:
     if isinstance(results, pd.DataFrame):
         return results.copy()
     return pd.read_csv(results)
 
 
-def _load_layer(path: str | Path | None):
+def _load_layer(path: Optional[Union[str, Path]]):
     if path is None:
         return None
     try:
@@ -42,12 +41,12 @@ def _load_layer(path: str | Path | None):
     layer = gpd.read_file(path)
     if layer.empty:
         return layer
-    if layer.crs is not None and layer.crs.to_epsg() != 4326:
+    if layer.crs is not None and str(layer.crs).upper() not in {"EPSG:4326", "WGS84"}:
         layer = layer.to_crs(4326)
     return layer
 
 
-def _prepare_axes(ax, boundary_path: str | Path | None, biomes_path: str | Path | None) -> None:
+def _prepare_axes(ax, boundary_path: Optional[Union[str, Path]], biomes_path: Optional[Union[str, Path]]) -> None:
     biomes = _load_layer(biomes_path)
     boundary = _load_layer(boundary_path)
 
@@ -92,10 +91,10 @@ def _valid_station_points(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def plot_dominant_quartile_map(
-    results: str | Path | pd.DataFrame,
-    output_path: str | Path,
-    boundary_path: str | Path | None = None,
-    biomes_path: str | Path | None = None,
+    results: Union[str, Path, pd.DataFrame],
+    output_path: Union[str, Path],
+    boundary_path: Optional[Union[str, Path]] = None,
+    biomes_path: Optional[Union[str, Path]] = None,
 ) -> Path:
     """Plot the dominant Huff quartile for each successfully processed station."""
     df = _valid_station_points(_read_results(results))
@@ -139,12 +138,12 @@ def plot_dominant_quartile_map(
 
 
 def plot_numeric_station_map(
-    results: str | Path | pd.DataFrame,
+    results: Union[str, Path, pd.DataFrame],
     column: str,
-    output_path: str | Path,
-    title: str | None = None,
-    boundary_path: str | Path | None = None,
-    biomes_path: str | Path | None = None,
+    output_path: Union[str, Path],
+    title: Optional[str] = None,
+    boundary_path: Optional[Union[str, Path]] = None,
+    biomes_path: Optional[Union[str, Path]] = None,
     cmap: str = "viridis",
 ) -> Path:
     """Plot a numeric station-level result column."""
@@ -185,11 +184,11 @@ def plot_numeric_station_map(
 
 
 def plot_station_maps(
-    results: str | Path | pd.DataFrame,
-    output_dir: str | Path,
-    boundary_path: str | Path | None = None,
-    biomes_path: str | Path | None = None,
-) -> dict[str, Path]:
+    results: Union[str, Path, pd.DataFrame],
+    output_dir: Union[str, Path],
+    boundary_path: Optional[Union[str, Path]] = None,
+    biomes_path: Optional[Union[str, Path]] = None,
+) -> Dict[str, Path]:
     """Generate the standard map set from the station result table."""
     output_dir = Path(output_dir)
     paths = {
@@ -229,10 +228,10 @@ def _station_intensity(df: pd.DataFrame) -> pd.Series:
 
 
 def plot_station_diagnostic_panel(
-    results: str | Path | pd.DataFrame,
-    output_path: str | Path,
-    boundary_path: str | Path | None = None,
-    biomes_path: str | Path | None = None,
+    results: Union[str, Path, pd.DataFrame],
+    output_path: Union[str, Path],
+    boundary_path: Optional[Union[str, Path]] = None,
+    biomes_path: Optional[Union[str, Path]] = None,
 ) -> Path:
     """Create a multi-panel diagnostic map for the station Huff dataset."""
     df = _valid_station_points(_read_results(results))
@@ -296,8 +295,8 @@ def plot_station_diagnostic_panel(
 def plot_region_choropleth(
     regions,
     column: str,
-    output_path: str | Path,
-    title: str | None = None,
+    output_path: Union[str, Path],
+    title: Optional[str] = None,
     cmap: str = "viridis",
     categorical: bool = False,
 ) -> Path:

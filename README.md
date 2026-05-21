@@ -29,6 +29,16 @@ For shapefile/biome map overlays and regional GIS exports:
 pip install -e ".[dev,geo]"
 ```
 
+On HPC systems that only provide Python 3.6, use the legacy setuptools path and keep pip/setuptools on Python-3.6-compatible releases:
+
+```bash
+python3.6 -m pip install "pip<22" "setuptools<60" wheel
+python3.6 -m pip install -e .
+
+# Include this extra when you need IBGE joins, shapefiles, GeoPackages, and maps:
+python3.6 -m pip install -e ".[geo]"
+```
+
 ## Run
 
 Process all stations in `Stations_Info.csv` and download ANA data:

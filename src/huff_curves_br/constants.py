@@ -1,7 +1,5 @@
 """Project constants and Huff reference curves."""
 
-from __future__ import annotations
-
 import numpy as np
 
 ANA_ENDPOINT = (

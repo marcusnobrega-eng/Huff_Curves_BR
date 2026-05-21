@@ -1,8 +1,7 @@
 """Curve-comparison metrics used by the Huff workflow."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
+from typing import Tuple
 
 import numpy as np
 
@@ -19,7 +18,7 @@ class MetricResult:
     n_valid: int
 
 
-def _finite_pairs(candidate: np.ndarray, reference: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def _finite_pairs(candidate: np.ndarray, reference: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     candidate = np.asarray(candidate, dtype=float).reshape(-1)
     reference = np.asarray(reference, dtype=float).reshape(-1)
     n = min(candidate.size, reference.size)
@@ -96,4 +95,3 @@ def fitness_metrics(candidate: np.ndarray, reference: np.ndarray) -> MetricResul
         kge = float("nan")
 
     return MetricResult(ia=ia, nse=nse, pbias=pbias, kge=kge, rmse=rmse, mae=mae, r2=r2, n_valid=n)
-

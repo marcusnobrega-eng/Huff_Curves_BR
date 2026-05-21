@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Download and normalize official IBGE reference layers."""
 
-from __future__ import annotations
-
 import argparse
 import sys
 from pathlib import Path

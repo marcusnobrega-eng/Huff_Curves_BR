@@ -1,8 +1,7 @@
 """Rainfall event extraction."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -35,7 +34,7 @@ def extract_events(
     min_event_depth_mm: float = DEFAULT_MIN_EVENT_DEPTH_MM,
     min_records: int = DEFAULT_MIN_EVENT_RECORDS,
     max_event_duration_hours: float = DEFAULT_MAX_EVENT_DURATION_HOURS,
-) -> list[RainfallEvent]:
+) -> List[RainfallEvent]:
     """Extract events by splitting wet clusters at dry gaps >= IETD."""
     if df.empty or not np.isfinite(timestep_min) or timestep_min <= 0:
         return []
@@ -55,7 +54,7 @@ def extract_events(
     starts = np.r_[wet_idx[0], wet_idx[split_pos + 1]]
     ends = np.r_[wet_idx[split_pos], wet_idx[-1]]
 
-    events: list[RainfallEvent] = []
+    events = []  # type: List[RainfallEvent]
     for start_idx, end_idx in zip(starts, ends):
         event_rain = rain[start_idx : end_idx + 1]
         event_zero = np.where(np.isfinite(event_rain), event_rain, 0.0)

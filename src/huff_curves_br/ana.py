@@ -1,14 +1,12 @@
 """ANA telemetric sub-daily rainfall downloader."""
 
-from __future__ import annotations
-
 import re
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 import pandas as pd
 import requests
@@ -25,12 +23,16 @@ class AnaDownloadConfig:
     retry_sleep_seconds: float = 3.0
 
 
-def _format_ana_date(value: str | datetime | pd.Timestamp) -> str:
+def _format_ana_date(value: Union[str, datetime, pd.Timestamp]) -> str:
     ts = pd.Timestamp(value)
     return f"{ts.day}/{ts.month}/{ts.year}"
 
 
-def iter_date_chunks(start: str | datetime, end: str | datetime, chunk_days: int) -> Iterable[tuple[pd.Timestamp, pd.Timestamp]]:
+def iter_date_chunks(
+    start: Union[str, datetime],
+    end: Union[str, datetime],
+    chunk_days: int,
+) -> Iterable[Tuple[pd.Timestamp, pd.Timestamp]]:
     """Yield inclusive date chunks for ANA requests."""
     start_ts = pd.Timestamp(start).normalize()
     end_ts = pd.Timestamp(end).normalize()
@@ -50,7 +52,7 @@ def _local_name(tag: str) -> str:
     return tag.rsplit("}", 1)[-1]
 
 
-def _text_as_float(text: str | None) -> float:
+def _text_as_float(text: Optional[str]) -> float:
     if text is None:
         return float("nan")
     text = text.strip().replace(",", ".")
@@ -62,7 +64,7 @@ def _text_as_float(text: str | None) -> float:
         return float("nan")
 
 
-def _text_as_datetime(text: str | None) -> pd.Timestamp:
+def _text_as_datetime(text: Optional[str]) -> pd.Timestamp:
     value = (text or "").strip()
     if not value:
         return pd.NaT
@@ -81,8 +83,8 @@ def _text_as_datetime(text: str | None) -> pd.Timestamp:
     return pd.Timestamp(pd.to_datetime(value, errors="coerce", dayfirst=True))
 
 
-def _parse_record_elements(root: ET.Element) -> list[dict[str, str]]:
-    records: list[dict[str, str]] = []
+def _parse_record_elements(root: ET.Element) -> List[Dict[str, str]]:
+    records = []  # type: List[Dict[str, str]]
     for elem in root.iter():
         children = list(elem)
         if not children:
@@ -99,7 +101,7 @@ def _parse_ana_xml(text: str) -> pd.DataFrame:
     The service has historically returned simple XML. The regex fallback keeps
     the parser useful if the response is wrapped in an unexpected XML envelope.
     """
-    records: list[dict[str, str]] = []
+    records = []  # type: List[Dict[str, str]]
     try:
         root = ET.fromstring(text.encode("utf-8"))
         records = _parse_record_elements(root)
@@ -120,7 +122,7 @@ def _parse_ana_xml(text: str) -> pd.DataFrame:
         stage = re.findall(r"<Nivel>(.*?)</Nivel>|<Nivel\s*/>", text, flags=re.IGNORECASE | re.DOTALL)
         flow = re.findall(r"<Vazao>(.*?)</Vazao>|<Vazao\s*/>", text, flags=re.IGNORECASE | re.DOTALL)
 
-        def pick(match: str | tuple[str, ...]) -> str:
+        def pick(match):
             if isinstance(match, tuple):
                 return next((x for x in match if x), "")
             return match
@@ -159,9 +161,9 @@ def _parse_ana_xml(text: str) -> pd.DataFrame:
 
 def fetch_station_chunk(
     station_id: str,
-    start: str | datetime,
-    end: str | datetime,
-    config: AnaDownloadConfig | None = None,
+    start: Union[str, datetime],
+    end: Union[str, datetime],
+    config: Optional[AnaDownloadConfig] = None,
 ) -> pd.DataFrame:
     """Fetch one station/date chunk from ANA."""
     cfg = config or AnaDownloadConfig()
@@ -171,7 +173,7 @@ def fetch_station_chunk(
         "dataFim": _format_ana_date(end),
     }
 
-    last_error: Exception | None = None
+    last_error = None  # type: Optional[Exception]
     for attempt in range(cfg.retries):
         try:
             response = requests.get(cfg.endpoint, params=params, timeout=cfg.timeout_seconds)
@@ -196,9 +198,9 @@ def fetch_station_chunk(
 
 def download_station(
     station_id: str,
-    start: str | datetime,
-    end: str | datetime,
-    config: AnaDownloadConfig | None = None,
+    start: Union[str, datetime],
+    end: Union[str, datetime],
+    config: Optional[AnaDownloadConfig] = None,
 ) -> pd.DataFrame:
     """Download a full station period by chunking ANA requests."""
     cfg = config or AnaDownloadConfig()
@@ -216,18 +218,18 @@ def download_station(
     return df
 
 
-def cache_path(raw_dir: str | Path, station_id: str) -> Path:
+def cache_path(raw_dir: Union[str, Path], station_id: str) -> Path:
     return Path(raw_dir) / "ana" / f"{station_id}.csv"
 
 
-def save_station_cache(df: pd.DataFrame, raw_dir: str | Path, station_id: str) -> Path:
+def save_station_cache(df: pd.DataFrame, raw_dir: Union[str, Path], station_id: str) -> Path:
     path = cache_path(raw_dir, station_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(path, index=False)
     return path
 
 
-def load_station_cache(raw_dir: str | Path, station_id: str) -> pd.DataFrame:
+def load_station_cache(raw_dir: Union[str, Path], station_id: str) -> pd.DataFrame:
     path = cache_path(raw_dir, station_id)
     if not path.exists():
         return pd.DataFrame(columns=["station_id", "datetime", "rainfall_mm", "stage_m", "flow_m3_s"])

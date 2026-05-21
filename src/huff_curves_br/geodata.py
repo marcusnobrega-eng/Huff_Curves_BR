@@ -1,9 +1,7 @@
 """Geospatial reference layers and station spatial joins."""
 
-from __future__ import annotations
-
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 import requests
@@ -20,7 +18,7 @@ def _require_geopandas():
     return gpd
 
 
-def _geojson_url(intrarregiao: str | None = None, quality: str = "intermediaria") -> str:
+def _geojson_url(intrarregiao: Optional[str] = None, quality: str = "intermediaria") -> str:
     url = f"{IBGE_MALHAS_API}/paises/BR?formato=application/vnd.geo+json&qualidade={quality}"
     if intrarregiao:
         url = f"{url}&intrarregiao={intrarregiao}"
@@ -125,19 +123,6 @@ def _find_shapefile(path: Path) -> Path:
     return terrestrial[0] if terrestrial else candidates[0]
 
 
-def _choose_biome_name_column(columns: list[str]) -> str | None:
-    preferred = ["NM_BIOMA", "NOME_BIOMA", "NOME", "NAME", "BIOMA", "BIOME"]
-    lower_lookup = {c.lower(): c for c in columns}
-    for candidate in preferred:
-        if candidate.lower() in lower_lookup:
-            return lower_lookup[candidate.lower()]
-    text_candidates = [c for c in columns if "nome" in c.lower() or c.lower().startswith("nm_")]
-    if text_candidates:
-        return text_candidates[0]
-    candidates = [c for c in columns if "bioma" in c.lower() and not c.lower().startswith(("cd", "id"))]
-    return candidates[0] if candidates else None
-
-
 def _normalize_biomes(shapefile_path: Path, output_path: Path) -> Path:
     gpd = _require_geopandas()
     biomes = gpd.read_file(shapefile_path).to_crs(4326)
@@ -154,11 +139,24 @@ def _normalize_biomes(shapefile_path: Path, output_path: Path) -> Path:
     return output_path
 
 
+def _choose_biome_name_column(columns: List[str]) -> Optional[str]:
+    preferred = ["NM_BIOMA", "NOME_BIOMA", "NOME", "NAME", "BIOMA", "BIOME"]
+    lower_lookup = {c.lower(): c for c in columns}
+    for candidate in preferred:
+        if candidate.lower() in lower_lookup:
+            return lower_lookup[candidate.lower()]
+    text_candidates = [c for c in columns if "nome" in c.lower() or c.lower().startswith("nm_")]
+    if text_candidates:
+        return text_candidates[0]
+    candidates = [c for c in columns if "bioma" in c.lower() and not c.lower().startswith(("cd", "id"))]
+    return candidates[0] if candidates else None
+
+
 def download_ibge_reference_layers(
-    reference_dir: str | Path = "data/reference/ibge",
+    reference_dir: Union[str, Path] = "data/reference/ibge",
     quality: str = "intermediaria",
     overwrite: bool = False,
-) -> dict[str, Path]:
+) -> Dict[str, Path]:
     """Download and normalize IBGE Brazil, state, municipality, and biome layers."""
     reference_dir = Path(reference_dir)
     downloads = reference_dir / "downloads"
@@ -186,7 +184,7 @@ def download_ibge_reference_layers(
     return paths
 
 
-def ibge_reference_paths(reference_dir: str | Path = "data/reference/ibge") -> dict[str, Path]:
+def ibge_reference_paths(reference_dir: Union[str, Path] = "data/reference/ibge") -> Dict[str, Path]:
     reference_dir = Path(reference_dir)
     normalized = reference_dir / "normalized"
     return {
@@ -197,7 +195,7 @@ def ibge_reference_paths(reference_dir: str | Path = "data/reference/ibge") -> d
     }
 
 
-def load_ibge_reference_layers(reference_dir: str | Path = "data/reference/ibge") -> dict[str, object]:
+def load_ibge_reference_layers(reference_dir: Union[str, Path] = "data/reference/ibge") -> Dict[str, object]:
     """Load normalized IBGE layers, downloading them first if needed."""
     gpd = _require_geopandas()
     paths = ibge_reference_paths(reference_dir)
@@ -206,7 +204,7 @@ def load_ibge_reference_layers(reference_dir: str | Path = "data/reference/ibge"
     return {name: gpd.read_file(path) for name, path in paths.items()}
 
 
-def station_results_to_geodata(results: str | Path | pd.DataFrame):
+def station_results_to_geodata(results: Union[str, Path, pd.DataFrame]):
     """Convert station results to a WGS84 GeoDataFrame."""
     gpd = _require_geopandas()
     df = pd.read_csv(results) if not isinstance(results, pd.DataFrame) else results.copy()
@@ -217,11 +215,33 @@ def station_results_to_geodata(results: str | Path | pd.DataFrame):
     return gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df["lon"], df["lat"]), crs=4326)
 
 
-def _spatial_join_columns(points, polygons, columns: list[str], suffix: str, fallback_distance_m: float = 75_000):
+def _manual_nearest_join(points, polygons, columns: List[str], fallback_distance_m: float):
+    """Small fallback for geopandas versions without sjoin_nearest."""
+    projected_points = points.to_crs(3857)
+    projected_polygons = polygons.to_crs(3857)
+    nearest = projected_points.copy()
+    for col in columns:
+        nearest[col] = pd.NA
+
+    for idx, point in projected_points.iterrows():
+        distances = projected_polygons.geometry.distance(point.geometry)
+        if distances.empty:
+            continue
+        nearest_idx = distances.idxmin()
+        if distances.loc[nearest_idx] <= fallback_distance_m:
+            for col in columns:
+                nearest.loc[idx, col] = projected_polygons.loc[nearest_idx, col]
+    return nearest.to_crs(points.crs)
+
+
+def _spatial_join_columns(points, polygons, columns: List[str], suffix: str, fallback_distance_m: float = 75_000):
     gpd = _require_geopandas()
     right = polygons[columns + ["geometry"]].copy()
     right = right.to_crs(points.crs)
-    joined = gpd.sjoin(points, right, how="left", predicate="within", rsuffix=suffix)
+    try:
+        joined = gpd.sjoin(points, right, how="left", predicate="within", rsuffix=suffix)
+    except TypeError:  # geopandas < 0.10 uses op instead of predicate.
+        joined = gpd.sjoin(points, right, how="left", op="within", rsuffix=suffix)
     index_cols = [c for c in joined.columns if c.startswith("index_")]
     joined = joined.drop(columns=index_cols, errors="ignore")
 
@@ -229,14 +249,17 @@ def _spatial_join_columns(points, polygons, columns: list[str], suffix: str, fal
         missing = joined[columns[0]].isna()
         if missing.any():
             missing_points = points.loc[joined.index[missing]].copy()
-            nearest = gpd.sjoin_nearest(
-                missing_points.to_crs(3857),
-                right.to_crs(3857),
-                how="left",
-                max_distance=fallback_distance_m,
-                distance_col=f"{suffix}_distance_m",
-                rsuffix=f"{suffix}_nearest",
-            ).to_crs(points.crs)
+            if hasattr(gpd, "sjoin_nearest"):
+                nearest = gpd.sjoin_nearest(
+                    missing_points.to_crs(3857),
+                    right.to_crs(3857),
+                    how="left",
+                    max_distance=fallback_distance_m,
+                    distance_col=f"{suffix}_distance_m",
+                    rsuffix=f"{suffix}_nearest",
+                ).to_crs(points.crs)
+            else:
+                nearest = _manual_nearest_join(missing_points, right, columns, fallback_distance_m)
             for col in columns:
                 if col in nearest.columns:
                     joined.loc[nearest.index, col] = nearest[col]
@@ -244,7 +267,7 @@ def _spatial_join_columns(points, polygons, columns: list[str], suffix: str, fal
 
 
 def enrich_station_geography(
-    station_results: str | Path | pd.DataFrame,
+    station_results: Union[str, Path, pd.DataFrame],
     municipalities=None,
     states=None,
     biomes=None,

@@ -1,10 +1,9 @@
 """Regional empirical Huff curve aggregation and GIS exports."""
 
-from __future__ import annotations
-
 import re
 import warnings
 from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -19,7 +18,7 @@ def _as_station_id(series: pd.Series) -> pd.Series:
     return series.astype(str).str.replace(r"\.0$", "", regex=True)
 
 
-def _fit_curve(tau: np.ndarray, curve: np.ndarray, quartile: int) -> tuple[np.ndarray, MetricResult]:
+def _fit_curve(tau: np.ndarray, curve: np.ndarray, quartile: int) -> Tuple[np.ndarray, MetricResult]:
     finite = np.isfinite(tau) & np.isfinite(curve)
     if finite.sum() < HUFF_FIT_DEGREE + 1:
         return np.full(HUFF_FIT_DEGREE + 1, np.nan), MetricResult(*(float("nan"),) * 7, n_valid=0)
@@ -29,7 +28,7 @@ def _fit_curve(tau: np.ndarray, curve: np.ndarray, quartile: int) -> tuple[np.nd
     return coeffs, fitness_metrics(fitted_reference_tau, reference)
 
 
-def _metric_prefix(row: dict[str, object], prefix: str, coeffs: np.ndarray, metrics: MetricResult) -> None:
+def _metric_prefix(row: Dict[str, object], prefix: str, coeffs: np.ndarray, metrics: MetricResult) -> None:
     row[f"{prefix}_kge"] = metrics.kge
     row[f"{prefix}_r2"] = metrics.r2
     row[f"{prefix}_rmse"] = metrics.rmse
@@ -38,13 +37,13 @@ def _metric_prefix(row: dict[str, object], prefix: str, coeffs: np.ndarray, metr
         row[f"{prefix}_coef_{i}"] = float(coef)
 
 
-def _dominant_quartile(row: pd.Series) -> int | None:
+def _dominant_quartile(row: pd.Series) -> Optional[int]:
     counts = np.array([row.get(f"q{q}_n_events", 0) for q in range(1, 5)], dtype=float)
     counts = np.where(np.isfinite(counts), counts, 0.0)
     return int(np.argmax(counts) + 1) if counts.sum() > 0 else None
 
 
-def _intensity_columns(df: pd.DataFrame) -> list[str]:
+def _intensity_columns(df: pd.DataFrame) -> List[str]:
     return [f"q{q}_max_intensity_mm_h" for q in range(1, 5) if f"q{q}_max_intensity_mm_h" in df.columns]
 
 
@@ -52,7 +51,7 @@ def _station_summary(
     stations: pd.DataFrame,
     region_id_col: str,
     region_name_col: str,
-    extra_cols: list[str],
+    extra_cols: List[str],
 ) -> pd.DataFrame:
     ok = stations[stations["status"].eq("ok")].copy()
     ok = ok.dropna(subset=[region_id_col])
@@ -91,10 +90,10 @@ def _station_summary(
 
 def regional_median_curves(
     stations: pd.DataFrame,
-    curves: str | Path | pd.DataFrame,
+    curves: Union[str, Path, pd.DataFrame],
     region_id_col: str,
     region_name_col: str,
-    extra_cols: list[str] | None = None,
+    extra_cols: Optional[List[str]] = None,
 ) -> pd.DataFrame:
     """Aggregate station median Huff curves to regional median curves."""
     extra_cols = extra_cols or []
@@ -125,12 +124,12 @@ def regional_median_curves(
 
 def regional_huff_coefficients(
     stations,
-    curves: str | Path | pd.DataFrame,
+    curves: Union[str, Path, pd.DataFrame],
     region_id_col: str,
     region_name_col: str,
     scope: str,
-    extra_cols: list[str] | None = None,
-) -> tuple[pd.DataFrame, pd.DataFrame]:
+    extra_cols: Optional[List[str]] = None,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Compute regional median Huff curves and polynomial coefficients."""
     extra_cols = extra_cols or []
     station_df = pd.DataFrame(stations.drop(columns="geometry", errors="ignore")).copy()
@@ -158,9 +157,9 @@ def regional_huff_coefficients(
     return coeffs, curves_long
 
 
-def _safe_shapefile_columns(columns: list[str]) -> dict[str, str]:
-    mapping: dict[str, str] = {}
-    used: set[str] = set()
+def _safe_shapefile_columns(columns: List[str]) -> Dict[str, str]:
+    mapping = {}  # type: Dict[str, str]
+    used = set()  # type: Set[str]
     replacements = {
         "municipality_code": "mun_code",
         "municipality_name": "mun_name",
@@ -204,9 +203,9 @@ def export_region_products(
     coefficients: pd.DataFrame,
     geometries,
     region_id_col: str,
-    output_dir: str | Path,
+    output_dir: Union[str, Path],
     basename: str,
-) -> dict[str, Path]:
+) -> Dict[str, Path]:
     """Export regional coefficients to CSV, GeoPackage, and Shapefile."""
     gpd = _require_geopandas()
     output_dir = Path(output_dir)
@@ -237,11 +236,11 @@ def export_region_products(
 
 
 def build_regional_products(
-    station_results: str | Path | pd.DataFrame,
-    curves: str | Path | pd.DataFrame,
-    reference_dir: str | Path = "data/reference/ibge",
-    output_dir: str | Path = "outputs/regional",
-) -> dict[str, Path]:
+    station_results: Union[str, Path, pd.DataFrame],
+    curves: Union[str, Path, pd.DataFrame],
+    reference_dir: Union[str, Path] = "data/reference/ibge",
+    output_dir: Union[str, Path] = "outputs/regional",
+) -> Dict[str, Path]:
     """Create state, municipality, and biome median-Huff coefficient products."""
     layers = load_ibge_reference_layers(reference_dir)
     stations = enrich_station_geography(

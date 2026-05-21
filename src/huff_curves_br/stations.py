@@ -1,8 +1,7 @@
 """Station catalog loading and normalization."""
 
-from __future__ import annotations
-
 from pathlib import Path
+from typing import Dict, Optional, Union
 
 import pandas as pd
 
@@ -22,7 +21,7 @@ STATION_COLUMNS = {
 }
 
 
-def load_station_catalog(path: str | Path, limit: int | None = None) -> pd.DataFrame:
+def load_station_catalog(path: Union[str, Path], limit: Optional[int] = None) -> pd.DataFrame:
     """Load a station catalog with station id, latitude, longitude, and optional area."""
     path = Path(path)
     df = pd.read_csv(path)
@@ -52,7 +51,7 @@ def load_station_catalog(path: str | Path, limit: int | None = None) -> pd.DataF
     return out
 
 
-def station_record(row: pd.Series) -> dict[str, object]:
+def station_record(row: pd.Series) -> Dict[str, object]:
     """Convert a station catalog row to a plain dictionary."""
     return {
         "station_id": str(row["station_id"]),
@@ -60,4 +59,3 @@ def station_record(row: pd.Series) -> dict[str, object]:
         "lon": float(row["lon"]),
         "area_km2": float(row["area_km2"]) if "area_km2" in row and pd.notna(row["area_km2"]) else None,
     }
-

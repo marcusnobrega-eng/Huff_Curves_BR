@@ -1,8 +1,7 @@
 """Rainfall time-series cleaning and regularization."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -20,8 +19,8 @@ class SeriesDiagnostics:
     n_observations: int
     missing_fraction: float
     years_span: float
-    first_timestamp: pd.Timestamp | None
-    last_timestamp: pd.Timestamp | None
+    first_timestamp: Optional[pd.Timestamp]
+    last_timestamp: Optional[pd.Timestamp]
     has_full_zero_year: bool
     max_daily_mm: float
 
@@ -46,7 +45,7 @@ def rainfall_column(df: pd.DataFrame) -> str:
     raise ValueError("Input dataframe must contain a rainfall_mm column")
 
 
-def regularize_series(df: pd.DataFrame, timestep_min: float | None = None) -> pd.DataFrame:
+def regularize_series(df: pd.DataFrame, timestep_min: Optional[float] = None) -> pd.DataFrame:
     """Sort, de-duplicate, and place rainfall data on a fixed time grid."""
     if "datetime" not in df.columns:
         raise ValueError("Input dataframe must contain a datetime column")
@@ -117,8 +116,8 @@ def fixed_daily_volumes(
         & (data["datetime"].dt.second == 0)
     ].to_numpy()
 
-    volumes: list[float] = []
-    labels: list[pd.Timestamp] = []
+    volumes = []  # type: List[float]
+    labels = []  # type: List[pd.Timestamp]
     for idx in starts:
         end_idx = idx + samples_per_day
         if end_idx > rain.size:
@@ -152,7 +151,7 @@ def has_full_zero_calendar_year(df: pd.DataFrame, timestep_min: float, completen
     return False
 
 
-def diagnostics(df: pd.DataFrame, timestep_min: float | None = None) -> SeriesDiagnostics:
+def diagnostics(df: pd.DataFrame, timestep_min: Optional[float] = None) -> SeriesDiagnostics:
     """Summarize a regularized rainfall series."""
     if df.empty:
         return SeriesDiagnostics(

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Download optional reference layers used by map scripts."""
 
-from __future__ import annotations
-
 import argparse
 import sys
 from pathlib import Path

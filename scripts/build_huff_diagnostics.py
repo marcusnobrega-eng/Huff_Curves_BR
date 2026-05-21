@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Build diagnostic maps and regional Huff coefficient GIS products."""
 
-from __future__ import annotations
-
 import argparse
 import sys
 from pathlib import Path

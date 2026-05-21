@@ -1,8 +1,7 @@
 """Empirical Huff curve derivation."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -31,7 +30,7 @@ class QuartileResult:
     metrics: MetricResult
     tau_grid: np.ndarray
     median_curve: np.ndarray
-    percentile_curves: dict[int, np.ndarray]
+    percentile_curves: Dict[int, np.ndarray]
 
 
 @dataclass(frozen=True)
@@ -41,8 +40,8 @@ class HuffResult:
     lon: float
     timestep_min: float
     n_events: int
-    dominant_quartile: int | None
-    quartiles: dict[int, QuartileResult]
+    dominant_quartile: Optional[int]
+    quartiles: Dict[int, QuartileResult]
 
 
 def original_huff_curves(tau: np.ndarray = HUFF_REFERENCE_TAU) -> np.ndarray:
@@ -74,7 +73,7 @@ def sanitize_cdf(values: np.ndarray, force_endpoints: bool = True) -> np.ndarray
     return arr.reshape(original_shape)
 
 
-def event_cumulative_curve(event: RainfallEvent) -> tuple[np.ndarray, np.ndarray]:
+def event_cumulative_curve(event: RainfallEvent) -> Tuple[np.ndarray, np.ndarray]:
     """Return tau and cumulative rainfall fraction for one event."""
     rainfall = np.asarray(event.rainfall_mm, dtype=float)
     depths = np.where(np.isfinite(rainfall), rainfall, 0.0)
@@ -102,11 +101,11 @@ def assign_huff_quartile(tau: np.ndarray, cumulative: np.ndarray) -> int:
 
 def _fit_quartile(
     quartile: int,
-    events: list[RainfallEvent],
+    events: List[RainfallEvent],
     event_quartiles: np.ndarray,
-    curves: list[tuple[np.ndarray, np.ndarray]],
+    curves: List[Tuple[np.ndarray, np.ndarray]],
     tau_grid: np.ndarray,
-    percentile_levels: tuple[int, ...],
+    percentile_levels: Tuple[int, ...],
 ) -> QuartileResult:
     idx = np.flatnonzero(event_quartiles == quartile)
     n_events = int(idx.size)
@@ -165,13 +164,13 @@ def compute_huff_result(
     lat: float,
     lon: float,
     timestep_min: float,
-    events: list[RainfallEvent],
+    events: List[RainfallEvent],
     interp_step: float = HUFF_INTERP_STEP,
-    percentile_levels: tuple[int, ...] = HUFF_PERCENTILE_LEVELS,
+    percentile_levels: Tuple[int, ...] = HUFF_PERCENTILE_LEVELS,
 ) -> HuffResult:
     """Compute empirical Huff curves and metrics for one station."""
     tau_grid = np.round(np.arange(0.0, 1.0 + interp_step / 2.0, interp_step), 10)
-    curves: list[tuple[np.ndarray, np.ndarray]] = []
+    curves = []  # type: List[Tuple[np.ndarray, np.ndarray]]
     event_quartiles = np.zeros(len(events), dtype=int)
 
     for i, event in enumerate(events):
@@ -198,9 +197,9 @@ def compute_huff_result(
     )
 
 
-def flatten_huff_result(result: HuffResult) -> dict[str, float | int | str | None]:
+def flatten_huff_result(result: HuffResult) -> Dict[str, Any]:
     """Flatten a station Huff result for CSV export."""
-    row: dict[str, float | int | str | None] = {
+    row = {
         "station_id": result.station_id,
         "lat": result.lat,
         "lon": result.lon,

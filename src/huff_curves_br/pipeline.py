@@ -1,11 +1,9 @@
 """End-to-end processing pipeline for ANA rainfall and empirical Huff curves."""
 
-from __future__ import annotations
-
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -33,7 +31,7 @@ from .huff import (
 from .series import SeriesDiagnostics, clean_rainfall_values, diagnostics, infer_timestep_minutes, regularize_series
 from .stations import load_station_catalog, station_record
 
-Downloader = Callable[[str, str, str, AnaDownloadConfig | None], pd.DataFrame]
+Downloader = Callable[[str, str, str, Optional[AnaDownloadConfig]], pd.DataFrame]
 ProgressCallback = Callable[[str], None]
 
 
@@ -44,7 +42,7 @@ class PipelineConfig:
     output_dir: Path = Path("outputs")
     start_date: str = DEFAULT_START_DATE
     end_date: str = DEFAULT_END_DATE
-    limit: int | None = None
+    limit: Optional[int] = None
     refresh_cache: bool = False
     allow_download: bool = True
     min_years: float = DEFAULT_MIN_YEARS
@@ -62,9 +60,9 @@ class StationPipelineResult:
     station_id: str
     status: str
     reason: str
-    row: dict[str, object]
-    events: list[RainfallEvent]
-    huff_result: HuffResult | None
+    row: Dict[str, object]
+    events: List[RainfallEvent]
+    huff_result: Optional[HuffResult]
 
 
 @dataclass(frozen=True)
@@ -77,7 +75,7 @@ class PipelineOutputs:
     curve_table: pd.DataFrame
 
 
-def _diagnostics_row(diag: SeriesDiagnostics | None) -> dict[str, object]:
+def _diagnostics_row(diag: Optional[SeriesDiagnostics]) -> Dict[str, object]:
     if diag is None:
         return {
             "dt_min": np.nan,
@@ -103,13 +101,13 @@ def _diagnostics_row(diag: SeriesDiagnostics | None) -> dict[str, object]:
 
 
 def _base_station_row(
-    station: dict[str, object],
+    station: Dict[str, object],
     status: str,
     reason: str,
-    diag: SeriesDiagnostics | None,
+    diag: Optional[SeriesDiagnostics],
     n_events: int = 0,
-) -> dict[str, object]:
-    row: dict[str, object] = {
+) -> Dict[str, object]:
+    row = {
         "station_id": station["station_id"],
         "lat": station["lat"],
         "lon": station["lon"],
@@ -122,8 +120,8 @@ def _base_station_row(
     return row
 
 
-def _quality_reasons(diag: SeriesDiagnostics, config: PipelineConfig) -> list[str]:
-    reasons: list[str] = []
+def _quality_reasons(diag: SeriesDiagnostics, config: PipelineConfig) -> List[str]:
+    reasons = []  # type: List[str]
     if not np.isfinite(diag.timestep_min) or diag.timestep_min <= 0:
         reasons.append("invalid_timestep")
     if np.isfinite(config.min_years) and diag.years_span < config.min_years:
@@ -142,7 +140,7 @@ def _empty_raw() -> pd.DataFrame:
 def _load_or_download_station(
     station_id: str,
     config: PipelineConfig,
-    ana_config: AnaDownloadConfig | None,
+    ana_config: Optional[AnaDownloadConfig],
     downloader: Downloader,
 ) -> pd.DataFrame:
     cached = _empty_raw() if config.refresh_cache else load_station_cache(config.raw_dir, station_id)
@@ -159,9 +157,9 @@ def _load_or_download_station(
 
 
 def process_station(
-    station: dict[str, object] | pd.Series,
+    station: Union[Dict[str, object], pd.Series],
     config: PipelineConfig,
-    ana_config: AnaDownloadConfig | None = None,
+    ana_config: Optional[AnaDownloadConfig] = None,
     downloader: Downloader = download_station,
 ) -> StationPipelineResult:
     """Process one station through download/cache, QC, event extraction, and Huff fitting."""
@@ -218,9 +216,9 @@ def process_station(
     return StationPipelineResult(station_id, "ok", "", row, events, huff)
 
 
-def event_rows(station_id: str, events: list[RainfallEvent]) -> list[dict[str, object]]:
+def event_rows(station_id: str, events: List[RainfallEvent]) -> List[Dict[str, object]]:
     """Convert extracted events into a flat CSV-friendly table."""
-    rows: list[dict[str, object]] = []
+    rows = []  # type: List[Dict[str, object]]
     for idx, event in enumerate(events, start=1):
         tau, cumulative = event_cumulative_curve(event)
         quartile = assign_huff_quartile(tau, cumulative) if tau.size else None
@@ -241,15 +239,15 @@ def event_rows(station_id: str, events: list[RainfallEvent]) -> list[dict[str, o
     return rows
 
 
-def curve_rows(result: HuffResult | None) -> list[dict[str, object]]:
+def curve_rows(result: Optional[HuffResult]) -> List[Dict[str, object]]:
     """Convert station Huff curves into long-form CSV rows."""
     if result is None:
         return []
 
-    rows: list[dict[str, object]] = []
+    rows = []  # type: List[Dict[str, object]]
     for quartile, q_result in result.quartiles.items():
         for i, tau in enumerate(q_result.tau_grid):
-            row: dict[str, object] = {
+            row = {
                 "station_id": result.station_id,
                 "lat": result.lat,
                 "lon": result.lon,
@@ -266,18 +264,18 @@ def curve_rows(result: HuffResult | None) -> list[dict[str, object]]:
 
 def run_pipeline(
     config: PipelineConfig,
-    ana_config: AnaDownloadConfig | None = None,
+    ana_config: Optional[AnaDownloadConfig] = None,
     downloader: Downloader = download_station,
-    progress: ProgressCallback | None = None,
+    progress: Optional[ProgressCallback] = None,
 ) -> PipelineOutputs:
     """Run the full station catalog workflow and write CSV outputs."""
     output_dir = Path(config.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     stations = load_station_catalog(config.station_catalog_path, limit=config.limit)
 
-    station_rows: list[dict[str, object]] = []
-    all_event_rows: list[dict[str, object]] = []
-    all_curve_rows: list[dict[str, object]] = []
+    station_rows = []  # type: List[Dict[str, object]]
+    all_event_rows = []  # type: List[Dict[str, object]]
+    all_curve_rows = []  # type: List[Dict[str, object]]
     station_records = [station_record(row) for _, row in stations.iterrows()]
 
     def collect_result(idx: int, result: StationPipelineResult) -> None:

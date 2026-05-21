@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Run the ANA download, rainfall-event, and empirical Huff curve pipeline."""
 
-from __future__ import annotations
-
 import argparse
 import sys
 from pathlib import Path
