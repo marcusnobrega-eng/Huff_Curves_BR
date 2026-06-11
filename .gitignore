@@ -10,6 +10,9 @@ data/processed/
 data/reference/
 outputs/
 
+# Generated website work folders. The GitHub Pages bundle lives in docs/.
+web/
+
 *.mat
 *.fig
 *.pdf

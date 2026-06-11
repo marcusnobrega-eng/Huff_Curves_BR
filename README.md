@@ -2,6 +2,42 @@
 
 Python workflow to download ANA sub-daily rainfall data, extract rainfall events, compute empirical Huff curves, compare them with the original Huff curves, and export station-level coefficient tables and maps.
 
+## Interactive Web Atlas
+
+This repository includes a static web atlas for exploring the empirical Huff
+curve results from Brazilian ANA sub-daily rainfall stations. The atlas is
+designed to be published directly with GitHub Pages from the `docs/` folder.
+
+The website provides:
+
+- A national station map colored by dominant Huff quartile.
+- Symbol sizes proportional to the number of valid rainfall events used at each station.
+- Station-level metadata, record span, missingness, event counts, and KGE diagnostics.
+- Normalized empirical Huff curves for each quartile.
+- Quartile-specific polynomial coefficients using:
+
+```text
+P / PT = c1 t^7 + c2 t^6 + c3 t^5 + c4 t^4 + c5 t^3 + c6 t^2 + c7 t + c8
+```
+
+where `t` is normalized storm time, `P / PT` is cumulative rainfall fraction,
+`PT` is total storm rainfall depth, and `c1...c8` are the fitted coefficients
+shown in the station panel.
+
+The design-storm tool lets users enter rainfall duration, total rainfall depth,
+and time step to generate and export quartile-specific hyetographs.
+
+### Publish With GitHub Pages
+
+1. Push this repository to GitHub.
+2. Open the repository settings.
+3. Go to **Pages**.
+4. Set the source to the `main` branch and `/docs` folder.
+5. Save and wait for GitHub Pages to deploy.
+
+The `docs/` folder contains only the static website files and compact browser
+data assets. The larger raw pipeline outputs remain ignored.
+
 ## Current Scope
 
 The repository now keeps only the pieces needed for:

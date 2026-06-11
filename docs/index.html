@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Huff Curves BR Atlas</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#">
+        <span class="brand-mark">H</span>
+        <span>
+          <strong>Huff Curves BR Atlas</strong>
+          <small>ANA sub-daily rainfall stations</small>
+        </span>
+      </a>
+      <nav class="top-actions" aria-label="Viewer actions">
+        <button class="button" id="fitAllButton" type="button">Fit Map</button>
+        <button class="button" id="exportCsvButton" type="button">Export CSV</button>
+      </nav>
+    </header>
+
+    <main class="app-shell">
+      <aside class="sidebar" aria-label="Station filters">
+        <section class="intro-panel">
+          <span class="eyebrow">Brazil empirical Huff curves</span>
+          <h1>Station rainfall temporal distributions</h1>
+        </section>
+
+        <section class="stats-grid" aria-label="Dataset totals">
+          <article>
+            <span>Stations</span>
+            <strong id="totalStations">-</strong>
+          </article>
+          <article>
+            <span>Usable</span>
+            <strong id="okStations">-</strong>
+          </article>
+          <article>
+            <span>Events</span>
+            <strong id="totalEvents">-</strong>
+          </article>
+        </section>
+
+        <section class="control-panel">
+          <label for="stationSearch">Station search</label>
+          <input id="stationSearch" class="search-input" type="search" placeholder="Code, city, state, biome" />
+
+          <div class="filter-grid">
+            <label>
+              <span>Status</span>
+              <select id="statusFilter">
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>
+              <span>Quartile</span>
+              <select id="quartileFilter">
+                <option value="all">All</option>
+                <option value="1">Q1</option>
+                <option value="2">Q2</option>
+                <option value="3">Q3</option>
+                <option value="4">Q4</option>
+              </select>
+            </label>
+            <label>
+              <span>State</span>
+              <select id="stateFilter">
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>
+              <span>Biome</span>
+              <select id="biomeFilter">
+                <option value="all">All</option>
+              </select>
+            </label>
+            <label>
+              <span>Min. events</span>
+              <input id="minEventsFilter" type="number" min="0" step="10" value="0" />
+            </label>
+            <label>
+              <span>Min. years</span>
+              <input id="minYearsFilter" type="number" min="0" step="1" value="0" />
+            </label>
+          </div>
+        </section>
+
+        <section class="list-panel">
+          <div class="section-head">
+            <h2>Stations</h2>
+            <span id="visibleCount">-</span>
+          </div>
+          <div class="station-list" id="stationList"></div>
+        </section>
+      </aside>
+
+      <section class="map-stage" aria-label="Station map">
+        <div id="map"></div>
+
+        <section class="floating-panel selected-card" id="selectedCard">
+          <span class="eyebrow" id="selectedStatus">Station</span>
+          <h2 id="selectedTitle">Loading data</h2>
+          <p id="selectedSubtitle">-</p>
+          <div class="metric-row">
+            <div><span>Dominant</span><strong id="selectedQuartile">-</strong></div>
+            <div><span>Events</span><strong id="selectedEvents">-</strong></div>
+            <div><span>KGE</span><strong id="selectedKge">-</strong></div>
+          </div>
+        </section>
+
+        <section class="floating-panel legend-panel">
+          <span class="eyebrow">Dominant quartile</span>
+          <div class="legend-items" id="legendItems"></div>
+        </section>
+      </section>
+
+      <aside class="detail-panel" aria-label="Station and dataset details">
+        <div class="tabbar">
+          <button class="active" type="button" data-panel="stationPanel">Station</button>
+          <button type="button" data-panel="analyticsPanel">Dataset</button>
+        </div>
+
+        <section id="stationPanel" class="panel-view active">
+          <div class="section-head">
+            <h2 id="stationHeading">Station</h2>
+            <span id="stationLocation">-</span>
+          </div>
+
+          <dl class="metadata-grid" id="metadataGrid"></dl>
+
+          <section class="chart-section">
+            <div class="section-head">
+              <h3>Event Quartiles</h3>
+              <span id="quartileSummary">-</span>
+            </div>
+            <canvas id="eventBreakdownChart" height="190"></canvas>
+          </section>
+
+          <section class="table-section">
+            <div class="section-head">
+              <h3>Quartile Statistics</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Q</th>
+                    <th>Events</th>
+                    <th>Volume</th>
+                    <th>Duration</th>
+                    <th>Peak</th>
+                    <th>KGE</th>
+                  </tr>
+                </thead>
+                <tbody id="quartileTable"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="chart-section">
+            <div class="section-head">
+              <h3>Normalized Curves</h3>
+              <span id="curveStatus">-</span>
+            </div>
+            <canvas id="curveChart" height="240"></canvas>
+          </section>
+
+          <section class="storm-section">
+            <div class="section-head">
+              <h3>Design Storm</h3>
+              <span id="stormPeak">-</span>
+            </div>
+
+            <div class="quartile-buttons" id="stormQuartileButtons"></div>
+
+            <div class="storm-controls">
+              <label>
+                <span>Duration (h)</span>
+                <input id="stormDuration" type="number" min="0.25" step="0.25" value="24" />
+              </label>
+              <label>
+                <span>Volume (mm)</span>
+                <input id="stormVolume" type="number" min="1" step="1" value="100" />
+              </label>
+              <label>
+                <span>Time step (min)</span>
+                <input id="stormTimestep" type="number" min="1" step="1" value="10" />
+              </label>
+              <button class="button" id="downloadStormButton" type="button">Active CSV</button>
+              <button class="button" id="downloadAllStormsButton" type="button">All CSV</button>
+            </div>
+
+            <canvas id="stormChart" height="250"></canvas>
+          </section>
+
+          <details class="coefficients-panel" open>
+            <summary>Polynomial coefficients</summary>
+            <div class="equation-card">
+              <p class="equation">
+                P / P<sub>T</sub> = c<sub>1</sub>t<sup>7</sup> + c<sub>2</sub>t<sup>6</sup> + c<sub>3</sub>t<sup>5</sup> + c<sub>4</sub>t<sup>4</sup> + c<sub>5</sub>t<sup>3</sup> + c<sub>6</sub>t<sup>2</sup> + c<sub>7</sub>t + c<sub>8</sub>
+              </p>
+              <dl>
+                <div><dt>t</dt><dd>Normalized storm time, t / T, from 0 to 1.</dd></div>
+                <div><dt>P / P<sub>T</sub></dt><dd>Cumulative rainfall fraction at normalized time t.</dd></div>
+                <div><dt>P<sub>T</sub></dt><dd>Total storm rainfall depth or design rainfall volume.</dd></div>
+                <div><dt>c<sub>1</sub>...c<sub>8</sub></dt><dd>Quartile-specific polynomial coefficients shown below.</dd></div>
+              </dl>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Quartile</th>
+                    <th>c1</th>
+                    <th>c2</th>
+                    <th>c3</th>
+                    <th>c4</th>
+                    <th>c5</th>
+                    <th>c6</th>
+                    <th>c7</th>
+                    <th>c8</th>
+                  </tr>
+                </thead>
+                <tbody id="coefficientTable"></tbody>
+              </table>
+            </div>
+          </details>
+        </section>
+
+        <section id="analyticsPanel" class="panel-view">
+          <div class="section-head">
+            <h2>Dataset Diagnostics</h2>
+            <span id="assetStamp">-</span>
+          </div>
+
+          <section class="analytics-kpis">
+            <article><span>Median years</span><strong id="medianYears">-</strong></article>
+            <article><span>Median KGE</span><strong id="medianKge">-</strong></article>
+            <article><span>Missingness</span><strong id="medianMissing">-</strong></article>
+          </section>
+
+          <section class="chart-section">
+            <h3>Status</h3>
+            <canvas id="statusChart" height="180"></canvas>
+          </section>
+
+          <section class="chart-section">
+            <h3>Dominant Quartile</h3>
+            <canvas id="dominantQuartileChart" height="190"></canvas>
+          </section>
+
+          <section class="chart-section">
+            <h3>Events Per Station</h3>
+            <canvas id="eventsHistogramChart" height="190"></canvas>
+          </section>
+
+          <section class="chart-section">
+            <h3>Years Of Data</h3>
+            <canvas id="yearsHistogramChart" height="190"></canvas>
+          </section>
+
+          <section class="table-section">
+            <div class="section-head">
+              <h3>States</h3>
+              <span>by event count</span>
+            </div>
+            <div class="table-wrap compact">
+              <table>
+                <thead>
+                  <tr><th>State</th><th>Stations</th><th>Events</th><th>Q</th><th>KGE</th></tr>
+                </thead>
+                <tbody id="stateSummaryTable"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="table-section">
+            <div class="section-head">
+              <h3>Biomes</h3>
+              <span>by event count</span>
+            </div>
+            <div class="table-wrap compact">
+              <table>
+                <thead>
+                  <tr><th>Biome</th><th>Stations</th><th>Events</th><th>Q</th><th>KGE</th></tr>
+                </thead>
+                <tbody id="biomeSummaryTable"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </aside>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="data/bootstrap.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
