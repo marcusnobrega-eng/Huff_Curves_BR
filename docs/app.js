@@ -834,6 +834,7 @@ function selectStation(stationId, zoom) {
   const station = state.stations.find((item) => item.station_id === stationId);
   if (!station) return;
   state.selected = station;
+  updateUrlState(stationId);
   renderStationDetails(station);
   renderStationList();
   renderStationCurves(station);
@@ -985,13 +986,205 @@ function wireEvents() {
   });
   byId('fitAllButton').addEventListener('click', fitFiltered);
   byId('exportCsvButton').addEventListener('click', exportFilteredCsv);
+  byId('shareButton').addEventListener('click', shareStation);
+  byId('helpButton').addEventListener('click', openWelcomeModal);
   byId('downloadStormButton').addEventListener('click', downloadStormCsv);
   byId('downloadAllStormsButton').addEventListener('click', downloadAllStormCsv);
+  byId('downloadCurveButton').addEventListener('click', () => {
+    const sid = state.selected ? state.selected.station_id : 'station';
+    downloadChart('curveChart', `huff_curves_${sid}.png`);
+  });
+  byId('downloadStormChartButton').addEventListener('click', () => {
+    const sid = state.selected ? state.selected.station_id : 'station';
+    const q = state.activeStormQuartile || 1;
+    downloadChart('stormChart', `design_storm_${sid}_q${q}.png`);
+  });
   byId('stormDuration').addEventListener('input', renderStormChart);
   byId('stormVolume').addEventListener('input', renderStormChart);
   byId('stormTimestep').addEventListener('input', renderStormChart);
   document.querySelectorAll('.tabbar button').forEach((button) => {
     button.addEventListener('click', () => showPanel(button.dataset.panel));
+  });
+}
+
+// ── Info tooltip content ──────────────────────────────────────────────────
+const INFO_TIPS = {
+  kge: 'Kling–Gupta Efficiency (KGE): measures goodness-of-fit between the observed cumulative curve and the fitted polynomial. Ranges from −∞ to 1; closer to 1 is better.',
+  dominant: 'Dominant quartile: the Q1–Q4 class with the most rainfall events at this station. Q1 = front-loaded (peak early); Q4 = back-loaded (peak late).',
+  events: 'Number of independent sub-daily rainfall events extracted after quality control (minimum volume, duration, and inter-event separation thresholds applied).',
+  curves: 'Dimensionless cumulative Huff curves. x-axis = fraction of storm duration (0→1); y-axis = fraction of total storm depth (0→1). Dashed band = 10th–90th percentile envelope for the active quartile.',
+  storm: 'Apply the local Huff curve to your own design storm: set total depth and duration, choose a quartile, and download the time-distributed hyetograph as CSV.',
+};
+
+function initInfoTooltips() {
+  const popup = byId('infoTipPopup');
+  if (!popup) return;
+  let hideTimer = null;
+  document.addEventListener('mouseover', (event) => {
+    const target = event.target.closest('[data-tip]');
+    if (!target) return;
+    const text = INFO_TIPS[target.dataset.tip];
+    if (!text) return;
+    clearTimeout(hideTimer);
+    popup.textContent = text;
+    popup.classList.add('visible');
+    const rect = target.getBoundingClientRect();
+    let left = rect.left;
+    let top = rect.bottom + 8;
+    if (left + 264 > window.innerWidth - 8) left = window.innerWidth - 272;
+    if (top + 100 > window.innerHeight) top = rect.top - 108;
+    popup.style.left = `${Math.max(8, left)}px`;
+    popup.style.top = `${Math.max(8, top)}px`;
+  });
+  document.addEventListener('mouseout', (event) => {
+    if (!event.target.closest('[data-tip]')) return;
+    hideTimer = setTimeout(() => popup.classList.remove('visible'), 100);
+  });
+}
+
+// ── Toast notification ────────────────────────────────────────────────────
+function showToast(message, duration = 2200) {
+  const toast = byId('toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+// ── URL deep-linking ──────────────────────────────────────────────────────
+function updateUrlState(stationId) {
+  if (!stationId || !window.history || !window.history.replaceState) return;
+  const url = new URL(window.location.href);
+  url.searchParams.set('s', String(stationId));
+  window.history.replaceState(null, '', url.toString());
+}
+
+function getUrlStation() {
+  try {
+    return new URLSearchParams(window.location.search).get('s') || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// ── Share station link ────────────────────────────────────────────────────
+function shareStation() {
+  const url = window.location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url)
+      .then(() => showToast('Link copied!'))
+      .catch(() => { try { prompt('Copy this link:', url); } catch (e2) {} });
+  } else {
+    try { prompt('Copy this link:', url); } catch (e) {}
+  }
+}
+
+// ── Chart PNG download ────────────────────────────────────────────────────
+function downloadChart(chartKey, filename) {
+  const chart = state.charts[chartKey];
+  if (!chart) { showToast('No chart to download.'); return; }
+  const dataUrl = chart.canvas.toDataURL('image/png');
+  const link = document.createElement('a');
+  link.href = dataUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+// ── Welcome modal ─────────────────────────────────────────────────────────
+const WELCOME_KEY = 'huffbr_v1_welcomed';
+let _modalStep = 0;
+const _MODAL_STEPS = 3;
+
+function _gotoModalStep(index) {
+  _modalStep = Math.max(0, Math.min(_MODAL_STEPS - 1, index));
+  ['welcomeStep0', 'welcomeStep1', 'welcomeStep2'].forEach((id, i) => {
+    const el = byId(id);
+    if (el) el.hidden = i !== _modalStep;
+  });
+  document.querySelectorAll('.modal-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === _modalStep);
+  });
+  const prev = byId('modalPrev');
+  const next = byId('modalNext');
+  if (prev) prev.style.visibility = _modalStep === 0 ? 'hidden' : '';
+  if (next) next.textContent = _modalStep === _MODAL_STEPS - 1 ? 'Done' : 'Next';
+}
+
+function openWelcomeModal() {
+  const overlay = byId('welcomeModal');
+  if (overlay) overlay.classList.remove('hidden');
+  _gotoModalStep(0);
+}
+
+function closeWelcomeModal() {
+  const overlay = byId('welcomeModal');
+  if (!overlay) return;
+  const cb = byId('modalDontShow');
+  if (cb && cb.checked) {
+    try { localStorage.setItem(WELCOME_KEY, '1'); } catch (e) {}
+  }
+  overlay.classList.add('hidden');
+}
+
+function initWelcomeModal() {
+  const overlay = byId('welcomeModal');
+  if (!overlay) return;
+
+  byId('modalPrev').addEventListener('click', () => _gotoModalStep(_modalStep - 1));
+  byId('modalNext').addEventListener('click', () => {
+    if (_modalStep === _MODAL_STEPS - 1) closeWelcomeModal();
+    else _gotoModalStep(_modalStep + 1);
+  });
+  byId('modalClose').addEventListener('click', closeWelcomeModal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeWelcomeModal(); });
+  document.querySelectorAll('.modal-dot').forEach((dot) => {
+    dot.addEventListener('click', () => _gotoModalStep(Number(dot.dataset.go)));
+  });
+
+  _gotoModalStep(0);
+
+  let firstVisit = true;
+  try { firstVisit = !localStorage.getItem(WELCOME_KEY); } catch (e) {}
+  if (firstVisit) overlay.classList.remove('hidden');
+}
+
+// ── Keyboard shortcuts ────────────────────────────────────────────────────
+function initKeyboard() {
+  document.addEventListener('keydown', (event) => {
+    const tag = (document.activeElement || {}).tagName || '';
+    const inField = /^(INPUT|TEXTAREA|SELECT)$/i.test(tag);
+    const modalOpen = byId('welcomeModal') && !byId('welcomeModal').classList.contains('hidden');
+
+    if (event.key === 'Escape' && modalOpen) { closeWelcomeModal(); return; }
+    if (inField) return;
+
+    if (event.key === '?' || event.key === 'h') { openWelcomeModal(); return; }
+
+    if (event.key === '/') {
+      event.preventDefault();
+      const search = byId('stationSearch');
+      if (search) { search.focus(); search.select(); }
+      return;
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (!state.filtered.length) return;
+      const sorted = state.filtered.slice().sort((a, b) => {
+        const aOk = a.status === 'ok' ? 1 : 0;
+        const bOk = b.status === 'ok' ? 1 : 0;
+        if (aOk !== bOk) return bOk - aOk;
+        return (numberValue(b.n_events) || 0) - (numberValue(a.n_events) || 0);
+      });
+      const cur = state.selected
+        ? sorted.findIndex((s) => s.station_id === state.selected.station_id)
+        : -1;
+      const next = Math.max(0, Math.min(sorted.length - 1,
+        event.key === 'ArrowDown' ? cur + 1 : cur - 1));
+      selectStation(sorted[next].station_id, true);
+    }
   });
 }
 
@@ -1020,12 +1213,21 @@ async function init() {
   renderLegend();
   renderAnalyticsCharts();
   wireEvents();
+  initWelcomeModal();
+  initInfoTooltips();
+  initKeyboard();
   applyFilters();
   fitFiltered();
 
-  const first = state.stations
-    .filter((station) => station.status === 'ok')
-    .sort((a, b) => (numberValue(b.n_events) || 0) - (numberValue(a.n_events) || 0))[0] || state.stations[0];
+  // Pre-select from URL (?s=stationId) or fall back to best-data station
+  const urlId = getUrlStation();
+  let first = urlId ? state.stations.find((s) => s.station_id === urlId) : null;
+  if (!first) {
+    first = state.stations
+      .filter((s) => s.status === 'ok')
+      .sort((a, b) => (numberValue(b.n_events) || 0) - (numberValue(a.n_events) || 0))[0]
+      || state.stations[0];
+  }
   if (first) selectStation(first.station_id, false);
 }
 

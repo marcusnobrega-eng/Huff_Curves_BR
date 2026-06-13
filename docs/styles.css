@@ -795,3 +795,250 @@ details summary {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Section-head right slot ─────────────────────────────────────────────── */
+.section-head-right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* ── Download button ─────────────────────────────────────────────────────── */
+.download-btn {
+  flex-shrink: 0;
+  height: 24px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 7px;
+  background: #111519;
+  color: var(--subtle);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+
+.download-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+/* ── Topbar icon button (Share / Help) ───────────────────────────────────── */
+.icon-button {
+  width: 38px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+/* ── Info tooltip popup ──────────────────────────────────────────────────── */
+.info-tip-popup {
+  position: fixed;
+  z-index: 8000;
+  max-width: 260px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: #1c2126;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.14s ease;
+}
+
+.info-tip-popup.visible {
+  opacity: 1;
+}
+
+[data-tip] {
+  cursor: help;
+}
+
+span[data-tip] {
+  border-bottom: 1px dashed var(--subtle);
+}
+
+/* ── Toast notification ──────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  z-index: 9500;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  min-width: 130px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 18px;
+  background: #1c2126;
+  color: var(--text);
+  font-size: 13px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Welcome modal overlay ───────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-card {
+  position: relative;
+  width: min(480px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 32px 28px 20px;
+  background: #15181b;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.64);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--subtle);
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--text);
+  background: #20262c;
+}
+
+.modal-step-icon {
+  font-size: 34px;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.modal-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.modal-body {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.modal-curves-svg {
+  display: block;
+  width: 100%;
+  max-width: 370px;
+  margin: 16px auto 0;
+}
+
+.modal-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.modal-list li {
+  margin-bottom: 10px;
+}
+
+.modal-accent {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+kbd {
+  display: inline-block;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+  background: #20262c;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.modal-dont-show {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.modal-dont-show input {
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.modal-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.modal-dot {
+  width: 8px;
+  height: 8px;
+  border: none;
+  border-radius: 50%;
+  background: var(--line);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.18s;
+}
+
+.modal-dot.active {
+  background: var(--accent);
+  width: 20px;
+  border-radius: 4px;
+}
+
+.modal-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-prev-btn {
+  color: var(--muted);
+}

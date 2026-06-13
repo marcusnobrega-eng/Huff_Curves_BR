@@ -19,6 +19,8 @@
       <nav class="top-actions" aria-label="Viewer actions">
         <button class="button" id="fitAllButton" type="button">Fit Map</button>
         <button class="button" id="exportCsvButton" type="button">Export CSV</button>
+        <button class="button" id="shareButton" type="button" title="Copy link to selected station">Share</button>
+        <button class="button icon-button" id="helpButton" type="button" title="How to use — press ? anytime" aria-label="Help">?</button>
       </nav>
     </header>
 
@@ -105,9 +107,9 @@
           <h2 id="selectedTitle">Loading data</h2>
           <p id="selectedSubtitle">-</p>
           <div class="metric-row">
-            <div><span>Dominant</span><strong id="selectedQuartile">-</strong></div>
-            <div><span>Events</span><strong id="selectedEvents">-</strong></div>
-            <div><span>KGE</span><strong id="selectedKge">-</strong></div>
+            <div><span data-tip="dominant">Dominant</span><strong id="selectedQuartile">-</strong></div>
+            <div><span data-tip="events">Events</span><strong id="selectedEvents">-</strong></div>
+            <div><span data-tip="kge">KGE</span><strong id="selectedKge">-</strong></div>
           </div>
         </section>
 
@@ -162,16 +164,22 @@
 
           <section class="chart-section">
             <div class="section-head">
-              <h3>Normalized Curves</h3>
-              <span id="curveStatus">-</span>
+              <h3 data-tip="curves">Normalized Curves</h3>
+              <div class="section-head-right">
+                <span id="curveStatus">-</span>
+                <button class="download-btn" id="downloadCurveButton" type="button" title="Save chart as PNG">↓ PNG</button>
+              </div>
             </div>
             <canvas id="curveChart" height="240"></canvas>
           </section>
 
           <section class="storm-section">
             <div class="section-head">
-              <h3>Design Storm</h3>
-              <span id="stormPeak">-</span>
+              <h3 data-tip="storm">Design Storm</h3>
+              <div class="section-head-right">
+                <span id="stormPeak">-</span>
+                <button class="download-btn" id="downloadStormChartButton" type="button" title="Save chart as PNG">↓ PNG</button>
+              </div>
             </div>
 
             <div class="quartile-buttons" id="stormQuartileButtons"></div>
@@ -294,6 +302,80 @@
         </section>
       </aside>
     </main>
+
+    <!-- Welcome / onboarding modal -->
+    <div class="modal-overlay hidden" id="welcomeModal" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
+      <div class="modal-card">
+        <button class="modal-close" id="modalClose" type="button" aria-label="Close">✕</button>
+
+        <!-- Step 0: What are Huff curves -->
+        <div class="modal-step" id="welcomeStep0">
+          <div class="modal-step-icon">🌧</div>
+          <h2 class="modal-title" id="welcomeModalTitle">Brazil's first empirical Huff atlas</h2>
+          <p class="modal-body">Huff (1967) curves classify storms by <em>when</em> peak intensity occurs.
+            <strong style="color:var(--q1)">Q1</strong> is front-loaded (peaks early);
+            <strong style="color:var(--q4)">Q4</strong> is back-loaded (peaks late).
+            This atlas was derived from thousands of ANA sub-daily gauge records across all six Brazilian biomes.</p>
+          <svg class="modal-curves-svg" viewBox="0 0 224 132" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <line x1="16" y1="116" x2="212" y2="116" stroke="#303741" stroke-width="1.2"/>
+            <line x1="16" y1="16" x2="16" y2="116" stroke="#303741" stroke-width="1.2"/>
+            <line x1="16" y1="116" x2="212" y2="16" stroke="#303741" stroke-width="0.8" stroke-dasharray="4 4"/>
+            <path d="M 16,116 C 64,28 136,16 212,16" stroke="#e84d4f" fill="none" stroke-width="2.2"/>
+            <path d="M 16,116 C 82,56 148,24 212,16" stroke="#f4b63f" fill="none" stroke-width="2.2"/>
+            <path d="M 16,116 C 92,90 160,40 212,16" stroke="#2cb7b0" fill="none" stroke-width="2.2"/>
+            <path d="M 16,116 C 114,106 176,60 212,16" stroke="#7c5cff" fill="none" stroke-width="2.2"/>
+            <text x="70" y="42" fill="#e84d4f" font-size="9" font-family="system-ui,sans-serif">Q1</text>
+            <text x="102" y="58" fill="#f4b63f" font-size="9" font-family="system-ui,sans-serif">Q2</text>
+            <text x="138" y="78" fill="#2cb7b0" font-size="9" font-family="system-ui,sans-serif">Q3</text>
+            <text x="162" y="98" fill="#7c5cff" font-size="9" font-family="system-ui,sans-serif">Q4</text>
+            <text x="114" y="130" fill="#7f8a91" font-size="8" font-family="system-ui,sans-serif" text-anchor="middle">Normalized time →</text>
+          </svg>
+        </div>
+
+        <!-- Step 1: Explore the map -->
+        <div class="modal-step" id="welcomeStep1" hidden>
+          <div class="modal-step-icon">🗺</div>
+          <h2 class="modal-title">Explore the map</h2>
+          <ul class="modal-list">
+            <li>Dot <span class="modal-accent">color</span> shows the dominant quartile at each station; <span class="modal-accent">dot size</span> scales with event count.</li>
+            <li>Filter by <span class="modal-accent">biome, state, or quartile</span> in the left panel, or type a station code, city, or state name in the search box.</li>
+            <li>Click any dot on the map or any row in the station list to load its Huff curves in the right panel.</li>
+          </ul>
+        </div>
+
+        <!-- Step 2: Design storms + keyboard shortcuts -->
+        <div class="modal-step" id="welcomeStep2" hidden>
+          <div class="modal-step-icon">⚡</div>
+          <h2 class="modal-title">Build design storms &amp; share</h2>
+          <ul class="modal-list">
+            <li>Under <span class="modal-accent">Design Storm</span> in the right panel, set storm <span class="modal-accent">duration</span>, total <span class="modal-accent">volume</span>, and <span class="modal-accent">time step</span> — then download the hyetograph as CSV.</li>
+            <li>Hit <span class="modal-accent">Share</span> in the top bar to copy a direct link to the current station.</li>
+            <li>Keyboard shortcuts: <kbd>/</kbd> focus search &nbsp;·&nbsp; <kbd>↑↓</kbd> navigate stations &nbsp;·&nbsp; <kbd>?</kbd> reopen this guide</li>
+          </ul>
+          <label class="modal-dont-show">
+            <input type="checkbox" id="modalDontShow"> Don't show this again
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <div class="modal-dots">
+            <button class="modal-dot active" data-go="0" type="button" aria-label="Step 1"></button>
+            <button class="modal-dot" data-go="1" type="button" aria-label="Step 2"></button>
+            <button class="modal-dot" data-go="2" type="button" aria-label="Step 3"></button>
+          </div>
+          <div class="modal-btns">
+            <button class="button modal-prev-btn" id="modalPrev" type="button" style="visibility:hidden">Back</button>
+            <button class="button" id="modalNext" type="button">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hover info tooltip -->
+    <div class="info-tip-popup" id="infoTipPopup" role="tooltip"></div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast" aria-live="polite"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
