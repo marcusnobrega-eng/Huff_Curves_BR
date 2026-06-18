@@ -1082,6 +1082,73 @@ function shareStation() {
   }
 }
 
+// ── Huff curves SVG generator ─────────────────────────────────────────────
+function generateHuffCurvesSVG(curves) {
+  const W = 560, H = 320;
+  const pL = 52, pR = 20, pT = 16, pB = 52;
+  const cW = W - pL - pR;
+  const cH = H - pT - pB;
+  const QC = { '1': '#e84d4f', '2': '#e0930a', '3': '#1a9a94', '4': '#5a3dcc' };
+  const QL = { '1': 'Q1 – 1st quartile', '2': 'Q2 – 2nd quartile', '3': 'Q3 – 3rd quartile', '4': 'Q4 – 4th quartile' };
+
+  const tx = (v) => (pL + v * cW).toFixed(2);
+  const ty = (v) => (pT + (1 - v) * cH).toFixed(2);
+
+  function path(tau, vals) {
+    if (!tau || !vals) return '';
+    return tau.map((t, i) => `${i === 0 ? 'M' : 'L'}${tx(t)},${ty(vals[i])}`).join(' ');
+  }
+
+  const lines = [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">`,
+    `<rect width="${W}" height="${H}" fill="#ffffff" rx="4"/>`,
+    `<rect x="${pL}" y="${pT}" width="${cW}" height="${cH}" fill="#f9f9f9" stroke="#dddddd" stroke-width="0.5"/>`,
+  ];
+
+  // Grid
+  for (let i = 0; i <= 10; i++) {
+    const gx = (+tx(i / 10)).toFixed(1);
+    const gy = (+ty(i / 10)).toFixed(1);
+    lines.push(`<line x1="${gx}" y1="${pT}" x2="${gx}" y2="${pT + cH}" stroke="#e0e0e0" stroke-width="0.5"/>`);
+    lines.push(`<line x1="${pL}" y1="${gy}" x2="${pL + cW}" y2="${gy}" stroke="#e0e0e0" stroke-width="0.5"/>`);
+    if (i % 2 === 0) {
+      lines.push(`<text x="${gx}" y="${pT + cH + 14}" text-anchor="middle" fill="#666" font-size="9" font-family="Arial">${(i / 10).toFixed(1)}</text>`);
+      lines.push(`<text x="${pL - 6}" y="${(+ty(i / 10) + 3).toFixed(1)}" text-anchor="end" fill="#666" font-size="9" font-family="Arial">${(i / 10).toFixed(1)}</text>`);
+    }
+  }
+
+  // 1:1 diagonal
+  lines.push(`<line x1="${tx(0)}" y1="${ty(0)}" x2="${tx(1)}" y2="${ty(1)}" stroke="#cccccc" stroke-width="1" stroke-dasharray="4,3"/>`);
+
+  // Curves
+  for (let q = 1; q <= 4; q++) {
+    const rec = curves.quartiles?.[String(q)];
+    if (!rec?.tau || !rec?.median) continue;
+    lines.push(`<path d="${path(rec.tau, rec.median)}" fill="none" stroke="${QC[String(q)]}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`);
+  }
+
+  // Axes
+  lines.push(`<line x1="${pL}" y1="${pT}" x2="${pL}" y2="${pT + cH}" stroke="#333" stroke-width="1.2"/>`);
+  lines.push(`<line x1="${pL}" y1="${pT + cH}" x2="${pL + cW}" y2="${pT + cH}" stroke="#333" stroke-width="1.2"/>`);
+
+  // Axis labels
+  lines.push(`<text x="${(pL + cW / 2).toFixed(1)}" y="${H - 6}" text-anchor="middle" fill="#333" font-size="11" font-family="Arial">Normalized time (t / T)</text>`);
+  lines.push(`<text x="11" y="${(pT + cH / 2).toFixed(1)}" text-anchor="middle" fill="#333" font-size="11" font-family="Arial" transform="rotate(-90 11 ${(pT + cH / 2).toFixed(1)})">Normalized precipitation (P / Pᵀ)</text>`);
+
+  // Legend (right side, inside chart area)
+  const legX = pL + cW - 130;
+  const legY = pT + 12;
+  lines.push(`<rect x="${legX - 4}" y="${legY - 10}" width="126" height="${4 * 20 + 4}" fill="white" fill-opacity="0.85" rx="3" stroke="#ddd" stroke-width="0.5"/>`);
+  for (let q = 1; q <= 4; q++) {
+    const ly = legY + (q - 1) * 20;
+    lines.push(`<line x1="${legX}" y1="${ly}" x2="${legX + 20}" y2="${ly}" stroke="${QC[String(q)]}" stroke-width="2"/>`);
+    lines.push(`<text x="${legX + 25}" y="${ly + 4}" fill="#333" font-size="10" font-family="Arial">${QL[String(q)]}</text>`);
+  }
+
+  lines.push('</svg>');
+  return lines.join('\n');
+}
+
 // ── Station report export (.docx) ─────────────────────────────────────────
 async function exportStationReport() {
   const station = state.selected;
@@ -1161,22 +1228,40 @@ async function exportStationReport() {
     });
   }
 
-  // Chart image
+  // Huff curves PNG at ~300 DPI (SVG rendered to high-res canvas)
   let chartImage = null;
-  const curveChart = state.charts && state.charts['curveChart'];
-  if (curveChart) {
+  if (state.selectedCurves) {
     try {
-      const dataUrl = curveChart.canvas.toDataURL('image/png');
-      const b64 = dataUrl.split(',')[1];
-      const bin = atob(b64);
-      const buf = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      const svgStr = generateHuffCurvesSVG(state.selectedCurves);
+      // SVG viewBox is 560×320; scale ×4 ≈ 300 DPI at 500pt print width
+      const scale = 4;
+      const svgW = 560, svgH = 320;
+      const pngBytes = await new Promise((resolve, reject) => {
+        const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = svgW * scale;
+          canvas.height = svgH * scale;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(url);
+          const b64 = canvas.toDataURL('image/png').split(',')[1];
+          const bin = atob(b64);
+          const buf = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+          resolve(buf.buffer);
+        };
+        img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
+        img.src = url;
+      });
       chartImage = new ImageRun({
-        type: 'png', data: buf.buffer,
-        transformation: { width: 500, height: 290 },
+        type: 'png', data: pngBytes,
+        transformation: { width: 500, height: 286 },
         altText: { title: 'Huff Curves', description: 'Normalized cumulative Huff curves', name: 'huffcurves' },
       });
-    } catch (e) { /* chart not ready */ }
+    } catch (e) { console.error('Chart image generation failed:', e); }
   }
 
   // Metadata table (2 cols: 3000 | 6026)
@@ -1329,6 +1414,58 @@ async function exportStationReport() {
         sp(80),
         bodyText('The Mean Absolute Error (MAE) measures the average absolute deviation between the observed cumulative curve and the fitted Huff reference curve, where lower values indicate better agreement.'),
         sp(300),
+
+        // 6. Design Storm Timeseries
+        ...(() => {
+          const duration = Math.max(0.01, numberValue(byId('stormDuration').value) || 24);
+          const volume = Math.max(0, numberValue(byId('stormVolume').value) || 100);
+          const timestep = Math.max(1, numberValue(byId('stormTimestep').value) || 10);
+          const rows1 = stormRowsForQuartile(1) || [];
+          const rows2 = stormRowsForQuartile(2) || [];
+          const rows3 = stormRowsForQuartile(3) || [];
+          const rows4 = stormRowsForQuartile(4) || [];
+          const nRows = Math.max(rows1.length, rows2.length, rows3.length, rows4.length);
+
+          if (!nRows) return [];
+
+          // 6 columns: Step | Period (h) | Q1 (mm) | Q2 (mm) | Q3 (mm) | Q4 (mm)
+          const SW = [800, 1500, 1682, 1682, 1682, 1680];
+
+          const stormTable = new Table({
+            width: { size: CW, type: WidthType.DXA },
+            columnWidths: SW,
+            rows: [
+              new TableRow({ children: [
+                hCell('Step', SW[0]),
+                hCell('Period (h)', SW[1]),
+                hCell('Q1 depth (mm)', SW[2]),
+                hCell('Q2 depth (mm)', SW[3]),
+                hCell('Q3 depth (mm)', SW[4]),
+                hCell('Q4 depth (mm)', SW[5]),
+              ] }),
+              ...Array.from({ length: nRows }, (_, i) => {
+                const r1 = rows1[i]; const r2 = rows2[i]; const r3 = rows3[i]; const r4 = rows4[i];
+                const ref = r1 || r2 || r3 || r4;
+                return new TableRow({ children: [
+                  dCell(String(i + 1), SW[0]),
+                  dCell(ref ? `${fmtFixed(ref.hour_start, 2)} – ${fmtFixed(ref.hour_end, 2)}` : '-', SW[1]),
+                  dCell(r1 ? fmtFixed(r1.depth_mm, 3) : '-', SW[2]),
+                  dCell(r2 ? fmtFixed(r2.depth_mm, 3) : '-', SW[3]),
+                  dCell(r3 ? fmtFixed(r3.depth_mm, 3) : '-', SW[4]),
+                  dCell(r4 ? fmtFixed(r4.depth_mm, 3) : '-', SW[5]),
+                ] });
+              }),
+            ],
+          });
+
+          return [
+            h1('6. Design Storm Timeseries'),
+            bodyText(`Incremental rainfall depth (mm) per time step for the design storm configuration: duration = ${fmtFixed(duration, 2)} h, total volume = ${fmtFixed(volume, 1)} mm, time step = ${fmt(timestep)} min. Each column represents the depth distribued according to the local Huff curve for that quartile.`),
+            sp(80),
+            stormTable,
+            sp(300),
+          ];
+        })(),
 
         // Citation
         new Paragraph({
