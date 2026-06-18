@@ -37,3 +37,7 @@ def test_compute_huff_result_flattens_coefficients():
     assert row["station_id"] == "123"
     assert row["q1_n_events"] == 2
     assert "q1_coef_8" in row
+    assert "q1_mae" in row
+    assert "q1_d_max" in row
+    assert "mae_mean" in row
+    assert "d_max_mean" in row

@@ -1,0 +1,262 @@
+\begin{thebibliography}{28}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Article
+\bibitem[{de~Abreu et~al.(2017)de~Abreu, Sobrinha and Brand{\~a}o}]{Abreu2017}
+\bibinfo{author}{de~Abreu, F.G.}, \bibinfo{author}{Sobrinha, L.A.},
+  \bibinfo{author}{Brand{\~a}o, J.L.B.}, \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{An{\'a}lise da distribui{\c{c}}{\~a}o temporal das
+  chuvas em eventos hidrol{\'o}gicos extremos}.
+\newblock \bibinfo{journal}{Engenharia Sanit{\'a}ria e Ambiental}
+  \bibinfo{volume}{22}, \bibinfo{pages}{239--250}.
+\newblock \DOIprefix\doi{10.1590/s1413-41522016146750}.
+%Type = Article
+\bibitem[{Azli and Rao(2010)}]{AzliRao2010}
+\bibinfo{author}{Azli, M.}, \bibinfo{author}{Rao, A.R.}, \bibinfo{year}{2010}.
+\newblock \bibinfo{title}{Development of {Huff} curves for {Peninsular
+  Malaysia}}.
+\newblock \bibinfo{journal}{Journal of Hydrology} \bibinfo{volume}{388},
+  \bibinfo{pages}{77--84}.
+\newblock \DOIprefix\doi{10.1016/j.jhydrol.2010.04.030}.
+%Type = Article
+\bibitem[{Back(2021)}]{SantaCatarina2021}
+\bibinfo{author}{Back, {\'A}.J.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Determina{\c{c}}{\~a}o das curvas de {Huff} para a
+  {Regi{\~a}o Serrana} de {Santa Catarina}}.
+\newblock \bibinfo{journal}{Brazilian Journal of Development}
+  \bibinfo{volume}{7}, \bibinfo{pages}{39200--39215}.
+\newblock \DOIprefix\doi{10.34117/bjdv7n4-400}.
+%Type = Article
+\bibitem[{Back and Rodrigues(2021)}]{Florianopolis2021}
+\bibinfo{author}{Back, {\'A}.J.}, \bibinfo{author}{Rodrigues, M.L.G.},
+  \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{Characterization of temporal rainfall distribution in
+  {Florian{\'o}polis}, {Santa Catarina}, {Brazil}}.
+\newblock \bibinfo{journal}{Revista Brasileira de Climatologia}
+  \bibinfo{volume}{28}, \bibinfo{pages}{526--546}.
+\newblock \DOIprefix\doi{10.5380/rbclima.v28i0.73260}.
+%Type = Article
+\bibitem[{Bezak et~al.(2018)Bezak, {\v{S}}raj, Rusjan and
+  Miko{\v{s}}}]{Bezak2018}
+\bibinfo{author}{Bezak, N.}, \bibinfo{author}{{\v{S}}raj, M.},
+  \bibinfo{author}{Rusjan, S.}, \bibinfo{author}{Miko{\v{s}}, M.},
+  \bibinfo{year}{2018}.
+\newblock \bibinfo{title}{Impact of the rainfall duration and temporal rainfall
+  distribution defined using the {Huff} curves on the hydraulic flood modelling
+  results}.
+\newblock \bibinfo{journal}{Geosciences} \bibinfo{volume}{8},
+  \bibinfo{pages}{69}.
+\newblock \DOIprefix\doi{10.3390/geosciences8020069}.
+%Type = Article
+\bibitem[{Bonta(2004)}]{Bonta2004}
+\bibinfo{author}{Bonta, J.V.}, \bibinfo{year}{2004}.
+\newblock \bibinfo{title}{Development and utility of {Huff} curves for
+  disaggregating precipitation amounts}.
+\newblock \bibinfo{journal}{Applied Engineering in Agriculture}
+  \bibinfo{volume}{20}, \bibinfo{pages}{641--653}.
+\newblock \DOIprefix\doi{10.13031/2013.17467}.
+%Type = Article
+\bibitem[{Bonta and Rao(1988)}]{BontaRao1988}
+\bibinfo{author}{Bonta, J.V.}, \bibinfo{author}{Rao, A.R.},
+  \bibinfo{year}{1988}.
+\newblock \bibinfo{title}{Factors affecting the identification of independent
+  storm events}.
+\newblock \bibinfo{journal}{Journal of Hydrology} \bibinfo{volume}{98},
+  \bibinfo{pages}{275--293}.
+\newblock \DOIprefix\doi{10.1016/0022-1694(88)90018-2}.
+%Type = Techreport
+\bibitem[{{DAEE}(1983)}]{DAEE1983}
+\bibinfo{author}{{DAEE}}, \bibinfo{year}{1983}.
+\newblock \bibinfo{title}{Plano Diretor de Macrodrenagem da Bacia do Alto
+  {Tiet{\^e}} ({PDMAT})}.
+\newblock \bibinfo{type}{Technical Report}. Departamento de {\'A}guas e Energia
+  El{\'e}trica do Estado de S{\~a}o Paulo. \bibinfo{address}{S{\~a}o Paulo}.
+%Type = Article
+\bibitem[{Dol{\v{s}}ak et~al.(2016)Dol{\v{s}}ak, Bezak and
+  {\v{S}}raj}]{Dolsak2016}
+\bibinfo{author}{Dol{\v{s}}ak, D.}, \bibinfo{author}{Bezak, N.},
+  \bibinfo{author}{{\v{S}}raj, M.}, \bibinfo{year}{2016}.
+\newblock \bibinfo{title}{Temporal characteristics of rainfall events under
+  three climate types in {Slovenia}}.
+\newblock \bibinfo{journal}{Journal of Hydrology} \bibinfo{volume}{541},
+  \bibinfo{pages}{1395--1405}.
+\newblock \DOIprefix\doi{10.1016/j.jhydrol.2016.08.047}.
+%Type = Article
+\bibitem[{Dunkerley(2022)}]{Dunkerley2022}
+\bibinfo{author}{Dunkerley, D.}, \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{{Huff} quartile classification of rainfall intensity
+  profiles (`storm patterns'): {A} modified approach employing an intensity
+  threshold}.
+\newblock \bibinfo{journal}{CATENA} \bibinfo{volume}{216},
+  \bibinfo{pages}{106371}.
+\newblock \DOIprefix\doi{10.1016/j.catena.2022.106371}.
+%Type = Misc
+\bibitem[{{European Space Agency and Airbus}(2022)}]{CopernicusDEM}
+\bibinfo{author}{{European Space Agency and Airbus}}, \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{Copernicus {DEM} -- global and european digital
+  elevation model ({GLO-90})}.
+\newblock \bibinfo{howpublished}{Copernicus Data Space Ecosystem}.
+\newblock \DOIprefix\doi{10.5270/ESA-c5d3d65}.
+%Type = Article
+\bibitem[{Gomes~Junior(2025)}]{GomesJuniorIDF}
+\bibinfo{author}{Gomes~Junior, M.N.}, \bibinfo{year}{2025}.
+\newblock \bibinfo{title}{A nationally consistent assessment of
+  intensity--duration--frequency curves for {Brazil} using long-term gridded
+  and satellite rainfall data}.
+\newblock \bibinfo{journal}{Physics and Chemistry of the Earth}
+  \bibinfo{note}{Under review}.
+%Type = Article
+\bibitem[{Hern{\'a}ndez~Zambrano et~al.(2026)Hern{\'a}ndez~Zambrano,
+  Simancas~Mart{\'i}nez, Hatum~Pont{\'o}n and Ramirez-Avila}]{Corrales2026}
+\bibinfo{author}{Hern{\'a}ndez~Zambrano, V.},
+  \bibinfo{author}{Simancas~Mart{\'i}nez, L.},
+  \bibinfo{author}{Hatum~Pont{\'o}n, A.}, \bibinfo{author}{Ramirez-Avila, J.},
+  \bibinfo{year}{2026}.
+\newblock \bibinfo{title}{Regionalization of short-duration storm temporal
+  patterns using {Huff} curves in a coastal tropical region}.
+\newblock \bibinfo{journal}{Hydrology} \bibinfo{volume}{13},
+  \bibinfo{pages}{127}.
+\newblock \DOIprefix\doi{10.3390/hydrology13050127}.
+%Type = Article
+\bibitem[{Huff(1967)}]{Huff1967}
+\bibinfo{author}{Huff, F.A.}, \bibinfo{year}{1967}.
+\newblock \bibinfo{title}{Time distribution of rainfall in heavy storms}.
+\newblock \bibinfo{journal}{Water Resources Research} \bibinfo{volume}{3},
+  \bibinfo{pages}{1007--1019}.
+\newblock \DOIprefix\doi{10.1029/WR003i004p01007}.
+%Type = Techreport
+\bibitem[{Huff and Angel(1992)}]{HuffAngel1992}
+\bibinfo{author}{Huff, F.A.}, \bibinfo{author}{Angel, J.R.},
+  \bibinfo{year}{1992}.
+\newblock \bibinfo{title}{Rainfall Frequency Atlas of the Midwest}.
+\newblock \bibinfo{type}{Technical Report} \bibinfo{number}{Bulletin 71}.
+  Illinois State Water Survey. \bibinfo{address}{Champaign, IL}.
+%Type = Article
+\bibitem[{Kirpich(1940)}]{Kirpich1940}
+\bibinfo{author}{Kirpich, Z.P.}, \bibinfo{year}{1940}.
+\newblock \bibinfo{title}{Time of concentration of small agricultural
+  watersheds}.
+\newblock \bibinfo{journal}{Civil Engineering} \bibinfo{volume}{10},
+  \bibinfo{pages}{362}.
+%Type = Article
+\bibitem[{Lehner and Grill(2013)}]{Lehner2013}
+\bibinfo{author}{Lehner, B.}, \bibinfo{author}{Grill, G.},
+  \bibinfo{year}{2013}.
+\newblock \bibinfo{title}{Global river hydrography and network routing:
+  baseline data and new approaches to study the world's large river systems}.
+\newblock \bibinfo{journal}{Hydrological Processes} \bibinfo{volume}{27},
+  \bibinfo{pages}{2171--2186}.
+\newblock \DOIprefix\doi{10.1002/hyp.9740}.
+%Type = Article
+\bibitem[{Marengo et~al.(2012)Marengo, Liebmann, Grimm, Misra, Silva~Dias,
+  Cavalcanti, Carvalho, Berbery, Ambrizzi, Vera, Saulo, Nogues-Paegle, Zipser,
+  Seth and Alves}]{Marengo2012}
+\bibinfo{author}{Marengo, J.A.}, \bibinfo{author}{Liebmann, B.},
+  \bibinfo{author}{Grimm, A.M.}, \bibinfo{author}{Misra, V.},
+  \bibinfo{author}{Silva~Dias, P.L.}, \bibinfo{author}{Cavalcanti, I.F.A.},
+  \bibinfo{author}{Carvalho, L.M.V.}, \bibinfo{author}{Berbery, E.H.},
+  \bibinfo{author}{Ambrizzi, T.}, \bibinfo{author}{Vera, C.S.},
+  \bibinfo{author}{Saulo, A.C.}, \bibinfo{author}{Nogues-Paegle, J.},
+  \bibinfo{author}{Zipser, E.J.}, \bibinfo{author}{Seth, A.},
+  \bibinfo{author}{Alves, L.M.}, \bibinfo{year}{2012}.
+\newblock \bibinfo{title}{Recent developments on the {South American} monsoon
+  system}.
+\newblock \bibinfo{journal}{International Journal of Climatology}
+  \bibinfo{volume}{32}, \bibinfo{pages}{1--21}.
+\newblock \DOIprefix\doi{10.1002/joc.2254}.
+%Type = Article
+\bibitem[{Massey(1951)}]{Massey1951}
+\bibinfo{author}{Massey, F.J.}, \bibinfo{year}{1951}.
+\newblock \bibinfo{title}{The {Kolmogorov-Smirnov} test for goodness of fit}.
+\newblock \bibinfo{journal}{Journal of the American Statistical Association}
+  \bibinfo{volume}{46}, \bibinfo{pages}{68--78}.
+\newblock \DOIprefix\doi{10.2307/2280095}.
+%Type = Article
+\bibitem[{Pan et~al.(2017)Pan, Wang, Liu, Huang and Wang}]{Liang2017}
+\bibinfo{author}{Pan, C.}, \bibinfo{author}{Wang, X.}, \bibinfo{author}{Liu,
+  L.}, \bibinfo{author}{Huang, H.}, \bibinfo{author}{Wang, D.},
+  \bibinfo{year}{2017}.
+\newblock \bibinfo{title}{Improvement to the {Huff} curve for design storms and
+  urban flooding simulations in {Guangzhou, China}}.
+\newblock \bibinfo{journal}{Water} \bibinfo{volume}{9}, \bibinfo{pages}{411}.
+\newblock \DOIprefix\doi{10.3390/w9060411}.
+%Type = Article
+\bibitem[{Poggio et~al.(2021)Poggio, de~Sousa, Batjes, Heuvelink, Kempen,
+  Ribeiro and Rossiter}]{Poggio2021}
+\bibinfo{author}{Poggio, L.}, \bibinfo{author}{de~Sousa, L.M.},
+  \bibinfo{author}{Batjes, N.H.}, \bibinfo{author}{Heuvelink, G.B.M.},
+  \bibinfo{author}{Kempen, B.}, \bibinfo{author}{Ribeiro, E.},
+  \bibinfo{author}{Rossiter, D.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{{SoilGrids} 2.0: producing soil information for the
+  globe with quantified spatial uncertainty}.
+\newblock \bibinfo{journal}{SOIL} \bibinfo{volume}{7},
+  \bibinfo{pages}{217--240}.
+\newblock \DOIprefix\doi{10.5194/soil-7-217-2021}.
+%Type = Article
+\bibitem[{Restrepo-Posada and Eagleson(1982)}]{RestrepoPosada1982}
+\bibinfo{author}{Restrepo-Posada, P.J.}, \bibinfo{author}{Eagleson, P.S.},
+  \bibinfo{year}{1982}.
+\newblock \bibinfo{title}{Identification of independent rainstorms}.
+\newblock \bibinfo{journal}{Journal of Hydrology} \bibinfo{volume}{55},
+  \bibinfo{pages}{303--319}.
+\newblock \DOIprefix\doi{10.1016/0022-1694(82)90136-6}.
+%Type = Techreport
+\bibitem[{{USDA-NRCS}(2004)}]{NRCS2004}
+\bibinfo{author}{{USDA-NRCS}}, \bibinfo{year}{2004}.
+\newblock \bibinfo{title}{National Engineering Handbook, Part 630: Hydrology}.
+\newblock \bibinfo{type}{Technical Report}. U.S. Department of Agriculture,
+  Natural Resources Conservation Service. \bibinfo{address}{Washington, DC}.
+%Type = Techreport
+\bibitem[{{USDA-SCS}(1986)}]{TR55_1986}
+\bibinfo{author}{{USDA-SCS}}, \bibinfo{year}{1986}.
+\newblock \bibinfo{title}{Urban Hydrology for Small Watersheds, Technical
+  Release 55 ({TR-55})}.
+\newblock \bibinfo{type}{Technical Report}. U.S. Department of Agriculture,
+  Soil Conservation Service. \bibinfo{address}{Washington, DC}.
+%Type = Book
+\bibitem[{Villani(2003)}]{Villani2003}
+\bibinfo{author}{Villani, C.}, \bibinfo{year}{2003}.
+\newblock \bibinfo{title}{Topics in Optimal Transportation}.
+  volume~\bibinfo{volume}{58} of \textit{\bibinfo{series}{Graduate Studies in
+  Mathematics}}.
+\newblock \bibinfo{publisher}{American Mathematical Society},
+  \bibinfo{address}{Providence, RI}.
+%Type = Manual
+\bibitem[{{WMO}(2018)}]{WMO2018}
+\bibinfo{author}{{WMO}}, \bibinfo{year}{2018}.
+\newblock \bibinfo{title}{Guide to Climatological Practices}.
+  \bibinfo{edition}{3rd} ed.
+\newblock \bibinfo{organization}{World Meteorological Organization}.
+  \bibinfo{address}{Geneva}.
+%Type = Article
+\bibitem[{Xavier et~al.(2022)Xavier, Scanlon, King and Alves}]{Xavier2022}
+\bibinfo{author}{Xavier, A.C.}, \bibinfo{author}{Scanlon, B.R.},
+  \bibinfo{author}{King, C.W.}, \bibinfo{author}{Alves, A.I.},
+  \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{New improved {Brazilian} daily weather gridded data
+  (1961--2020)}.
+\newblock \bibinfo{journal}{International Journal of Climatology}
+  \bibinfo{volume}{42}, \bibinfo{pages}{8390--8404}.
+\newblock \DOIprefix\doi{10.1002/joc.7731}.
+%Type = Article
+\bibitem[{Zipser et~al.(2006)Zipser, Cecil, Liu, Nesbitt and
+  Yorty}]{Zipser2006}
+\bibinfo{author}{Zipser, E.J.}, \bibinfo{author}{Cecil, D.J.},
+  \bibinfo{author}{Liu, C.}, \bibinfo{author}{Nesbitt, S.W.},
+  \bibinfo{author}{Yorty, D.P.}, \bibinfo{year}{2006}.
+\newblock \bibinfo{title}{Where are the most intense thunderstorms on {Earth}?}
+\newblock \bibinfo{journal}{Bulletin of the American Meteorological Society}
+  \bibinfo{volume}{87}, \bibinfo{pages}{1057--1071}.
+\newblock \DOIprefix\doi{10.1175/BAMS-87-8-1057}.
+
+\end{thebibliography}

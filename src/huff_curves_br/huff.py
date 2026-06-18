@@ -140,7 +140,7 @@ def _fit_quartile(
         metrics = fitness_metrics(fitted_reference_tau, reference)
     else:
         coeffs = np.full(HUFF_FIT_DEGREE + 1, np.nan, dtype=float)
-        metrics = MetricResult(*(float("nan"),) * 7, n_valid=0)
+        metrics = MetricResult(*(float("nan"),) * 8, n_valid=0)
 
     return QuartileResult(
         quartile=quartile,
@@ -218,13 +218,18 @@ def flatten_huff_result(result: HuffResult) -> Dict[str, Any]:
         row[f"{prefix}_avg_duration_h"] = qr.average_duration_hours
         row[f"{prefix}_std_duration_h"] = qr.std_duration_hours
         row[f"{prefix}_max_intensity_mm_h"] = qr.max_intensity_mm_h
+        row[f"{prefix}_mae"] = qr.metrics.mae
+        row[f"{prefix}_d_max"] = qr.metrics.d_max
         row[f"{prefix}_kge"] = qr.metrics.kge
         row[f"{prefix}_r2"] = qr.metrics.r2
         row[f"{prefix}_rmse"] = qr.metrics.rmse
-        row[f"{prefix}_mae"] = qr.metrics.mae
         for i, coef in enumerate(qr.polynomial_coefficients, start=1):
             row[f"{prefix}_coef_{i}"] = float(coef)
 
+    maes = [result.quartiles[q].metrics.mae for q in range(1, 5)]
+    row["mae_mean"] = float(np.nanmean(maes)) if np.isfinite(maes).any() else float("nan")
+    d_maxes = [result.quartiles[q].metrics.d_max for q in range(1, 5)]
+    row["d_max_mean"] = float(np.nanmean(d_maxes)) if np.isfinite(d_maxes).any() else float("nan")
     kges = [result.quartiles[q].metrics.kge for q in range(1, 5)]
     row["kge_mean"] = float(np.nanmean(kges)) if np.isfinite(kges).any() else float("nan")
     return row

@@ -15,6 +15,7 @@ class MetricResult:
     rmse: float
     mae: float
     r2: float
+    d_max: float
     n_valid: int
 
 
@@ -53,7 +54,7 @@ def fitness_metrics(candidate: np.ndarray, reference: np.ndarray) -> MetricResul
     candidate, reference = _finite_pairs(candidate, reference)
     n = candidate.size
     if n < 2:
-        return MetricResult(*(float("nan"),) * 7, n_valid=n)
+        return MetricResult(*(float("nan"),) * 8, n_valid=n)
 
     residual = candidate - reference
     sse = float(np.sum(residual**2))
@@ -94,4 +95,6 @@ def fitness_metrics(candidate: np.ndarray, reference: np.ndarray) -> MetricResul
     else:
         kge = float("nan")
 
-    return MetricResult(ia=ia, nse=nse, pbias=pbias, kge=kge, rmse=rmse, mae=mae, r2=r2, n_valid=n)
+    d_max = float(np.max(np.abs(residual)))
+
+    return MetricResult(ia=ia, nse=nse, pbias=pbias, kge=kge, rmse=rmse, mae=mae, r2=r2, d_max=d_max, n_valid=n)

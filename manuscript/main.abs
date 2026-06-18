@@ -1,0 +1,38 @@
+Temporal rainfall distributions underpin design-storm construction and
+hydrological modelling, yet Brazil lacks a national-scale empirical
+reference based on local sub-daily records. The only widely used
+framework — Huff curves derived from 261 storms recorded in Illinois,
+USA (Huff, 1967) — was calibrated in a temperate mid-western climate
+fundamentally different from Brazil's predominantly tropical and
+subtropical convective regime. Here we derive the first national-scale
+empirical Huff curves for Brazil using sub-daily records from 3,164
+stations of the Agência Nacional de Águas (ANA) telemetric network.
+After applying quality filters (record length $\geq$~4 years, missing
+fraction $\leq$~20\%) and storm-selection criteria matching Huff
+(1967) — minimum storm total 12.7~mm (0.5~in), inter-event time
+definition (IETD) of 6~h — a total of 290,164 qualifying events from
+1,045 stations spanning 2010–2025 were retained. Empirical cumulative
+mass curves were fitted with 7th-degree polynomials at station,
+biome, state, and municipality levels. The first quartile (Q1,
+front-loaded storms) is dominant at 94.4\% of stations nationally,
+rising to 99.2\% in the Amazônia and Cerrado biomes and falling to
+88.7\% in the more climatically diverse Mata Atlântica. The national
+Q1 median curve yields a mean absolute error (MAE) of 0.045 and a
+maximum absolute deviation ($D_\mathrm{max}$) of 0.097 relative to
+the Huff (1967) reference, with bootstrap 95\% confidence intervals
+on the national median remaining narrow (mean width 0.006). Q1
+dominance is robust to IETD choice: 84.7\% of stations retain the
+same dominant quartile across all tested values (2–12~h). We attribute
+Q1 prevalence to thermally driven deep convection that releases
+atmospheric instability rapidly, concentrating rainfall in the first
+quarter of storm time, a mechanism corroborated by a pronounced
+afternoon maximum in event initiation. A controlled SCS-CN
+design-hydrograph experiment on 579 small headwater catchments shows
+that the steeper Brazilian curves raise the design peak discharge by a
+median of 8\% — and by up to 11\% in the convective Cerrado — relative
+to the Illinois reference, which therefore under-predicts design peaks
+in the unconservative direction. Biome-, state-, and municipality-level
+polynomial coefficients are provided as open supplementary data and
+through an interactive web application, offering a locally calibrated
+alternative to the Illinois reference for Brazilian design-storm
+applications.

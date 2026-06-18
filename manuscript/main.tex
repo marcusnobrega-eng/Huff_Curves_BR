@@ -1,0 +1,1750 @@
+%% Elsevier CAS Single-Column Template
+%% Journal of Hydrology
+%% Author: Marcus Nobrega Gomes Junior
+
+\documentclass[a4paper,fleqn]{cas-sc}
+
+%% Packages
+\usepackage[authoryear,longnamesfirst]{natbib}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{lineno}
+\usepackage{setspace}
+
+%% Manuscript line numbers (remove for final)
+\linenumbers
+
+%%====================================================================
+\begin{document}
+
+%%--------------------------------------------------------------------
+%% Frontmatter declarations
+%%--------------------------------------------------------------------
+\shorttitle{Time Distribution of Heavy Rainfall in Brazil: Empirical Huff Curves from 290,164 Sub-Daily Storm Events}
+\shortauthors{Gomes Junior}
+
+\title[mode=title]{Time Distribution of Heavy Rainfall in Brazil: Empirical Huff Curves from 290,164 Sub-Daily Storm Events}
+
+\author[1]{Marcus Nobrega Gomes Junior}[%
+  orcid=0000-0002-8250-8195]
+\cormark[1]
+\ead{mngomes@stanford.edu}
+
+\affiliation[1]{
+  organization={Department of Earth System Science, Stanford University},
+  addressline={Braun Hall, Bldg. 320, 450 Jane Stanford Way, 450 Serra Mall},
+  city={Stanford},
+  state={California},
+  postcode={94305},
+  country={USA}
+}
+
+
+\cortext[1]{Corresponding author}
+
+\maketitle
+
+%%--------------------------------------------------------------------
+\begin{abstract}
+Temporal rainfall distributions underpin design-storm construction and
+hydrological modelling, yet Brazil lacks a national-scale empirical
+reference based on local sub-daily records. The only widely used
+framework — Huff curves derived from 261 storms recorded in Illinois,
+USA (Huff, 1967) — was calibrated in a temperate mid-western climate
+fundamentally different from Brazil's predominantly tropical and
+subtropical convective regime. Here we derive the first national-scale
+empirical Huff curves for Brazil using sub-daily records from 3,164
+stations of the Agência Nacional de Águas (ANA) telemetric network.
+After applying quality filters (record length $\geq$~4 years, missing
+fraction $\leq$~20\%) and storm-selection criteria matching Huff
+(1967) — minimum storm total 12.7~mm (0.5~in), inter-event time
+definition (IETD) of 6~h — a total of 290,164 qualifying events from
+1,045 stations spanning 2010–2025 were retained. Empirical cumulative
+mass curves were fitted with 7th-degree polynomials at station,
+biome, state, and municipality levels. The first quartile (Q1,
+front-loaded storms) is dominant at 94.4\% of stations nationally,
+rising to 99.2\% in the Amazônia and Cerrado biomes and falling to
+88.7\% in the more climatically diverse Mata Atlântica. The national
+Q1 median curve yields a mean absolute error (MAE) of 0.045 and a
+maximum absolute deviation ($D_\mathrm{max}$) of 0.097 relative to
+the Huff (1967) reference, with bootstrap 95\% confidence intervals
+on the national median remaining narrow (mean width 0.006). Q1
+dominance is robust to IETD choice: 84.7\% of stations retain the
+same dominant quartile across all tested values (2–12~h). We attribute
+Q1 prevalence to thermally driven deep convection that releases
+atmospheric instability rapidly, concentrating rainfall in the first
+quarter of storm time, a mechanism corroborated by a pronounced
+afternoon maximum in event initiation. A controlled SCS-CN
+design-hydrograph experiment on 579 small headwater catchments shows
+that the steeper Brazilian curves raise the design peak discharge by a
+median of 8\% — and by up to 11\% in the convective Cerrado — relative
+to the Illinois reference, which therefore under-predicts design peaks
+in the unconservative direction. Biome-, state-, and municipality-level
+polynomial coefficients are provided as open supplementary data and
+through an interactive web application, offering a locally calibrated
+alternative to the Illinois reference for Brazilian design-storm
+applications.
+\end{abstract}
+
+\begin{highlights}
+\item First national-scale empirical Huff curves for Brazil from
+      1,045 ANA sub-daily rain-gauge stations.
+\item Q1 (front-loaded) storms dominate at 94.4\% of stations
+      across all six IBGE biomes.
+\item National Q1 MAE = 0.045 vs.\ Huff (1967); Brazil curves are
+      systematically steeper in the first quarter.
+\item Q1 classification robust across IETD values 2–12~h
+      (84.7\% station stability).
+\item Updated curves raise SCS-CN design peak discharge by a median
+      8\% (up to 11\% in the Cerrado) over the Illinois reference.
+\item Open polynomial coefficient tables at biome, state, and
+      municipality scales for engineering applications.
+\end{highlights}
+
+\begin{keywords}
+Huff curves \sep Temporal rainfall distribution \sep Design storms
+\sep Brazil \sep Sub-daily rainfall \sep Convective storms \sep
+ANA telemetric network
+\end{keywords}
+
+%%====================================================================
+\section{Introduction}
+\label{sec:intro}
+
+Urbanisation alters the water cycle in ways that amplify the
+consequences of extreme rainfall: impervious surfaces accelerate
+runoff generation, reduce time-to-peak, and raise peak discharge
+relative to natural catchments of the same area
+\citep{Marengo2012, Zipser2006}. As global urban populations expand
+and climate change intensifies precipitation extremes, the capacity
+of urban drainage systems — storm sewers, detention basins, green
+infrastructure, and flood retention structures — to safely convey
+and store excess water becomes increasingly critical. The hydraulic
+design of each component requires translating a statistical description
+of extreme rainfall (the design storm) into a time-varying rainfall
+rate that can be routed through the drainage network. This
+translation demands two pieces of information: the total rainfall
+depth associated with a given duration and return period, encoded in
+intensity–duration–frequency (IDF) curves; and the temporal distribution
+of that depth within the storm, which determines how rapidly the
+drainage system is loaded and therefore governs peak discharge, maximum
+water levels, and overflow volumes.
+
+The temporal distribution — often called the storm hyetograph or
+rainfall mass curve — is not a secondary consideration. Storms of
+identical total depth and duration produce radically different
+hydrological responses depending on whether the rainfall is concentrated
+at the beginning, middle, or end of the event. Front-loaded storms
+generate high initial abstraction losses followed by rapid overland
+flow on a progressively saturating surface, yielding a sharp,
+early hydrograph peak. Back-loaded or uniform storms allow longer
+periods of infiltration before surface runoff initiates, shifting
+the peak later and broadening the hydrograph. Retention basins sized
+for one pattern may overflow under another. Sewer pipes dimensioned
+for a particular peak-flow rate may be undersized if the actual storm
+produces a steeper rising limb than assumed in design. In short,
+the temporal pattern of rainfall is as consequential for infrastructure
+design as its intensity.
+
+In engineering practice, temporal distributions are standardised
+through dimensionless mass curves that express cumulative storm depth
+as a fraction of total depth against normalised storm time. Several
+frameworks have been proposed — the SCS Type curves for the United
+States, the Chicago hyetograph, and the alternating-block method,
+among others — but the four-quartile scheme of \citet{Huff1967}
+has become the most widely adopted international reference.
+In that framework, storms are grouped according to the quarter of
+normalised storm duration in which the greatest depth falls — Q1
+if rainfall is most intense in the first 25\% of storm time, Q2
+in the second quarter, and so on — and empirical cumulative mass
+curves are derived for each class from a long gauge record.
+
+\citet{Huff1967} developed the original curves from 261 heavy storms
+(minimum total depth 12.7~mm, i.e., 0.5~in) recorded on a
+dense 49-gauge network in Illinois, USA, over 1955–1966. The
+resulting four-quartile distributions — together with the expanded
+tabulations of \citet{HuffAngel1992} — have since been adopted in
+hydrological studies, rainfall disaggregation procedures, and
+drainage-design codes worldwide \citep{Bonta2004, Bezak2018}.
+This widespread adoption persists despite the fact that the curves
+were calibrated in a temperate continental climate fundamentally
+different from the tropical and subtropical regimes where they are
+most often applied without local verification.
+
+The sensitivity of the hydrological response to the choice of design
+storm temporal distribution has been repeatedly and sharply quantified.
+\citet{Bezak2018} reported peak-flow differences of up to 132\%
+between storm types in a central-European context, while
+\citet{Abreu2017} found that substituting a Q1 Huff pattern for a
+uniform distribution changed peak flow by 46\%, flood inundation area
+by 57\%, and inundation depth by 1.5~m in a Brazilian watershed.
+These findings establish that the selection of an appropriate temporal
+pattern is not a secondary methodological concern but a primary source
+of uncertainty in flood-risk assessment.
+
+Driven by this recognition, Huff-curve derivations have proliferated
+globally, consistently revealing that the dominant quartile and
+curve shape are strongly climate-dependent and cannot be extrapolated
+from Illinois. \citet{AzliRao2010} derived Huff curves from
+approximately 5,800 storms at 36 automatic stations across Peninsular
+Malaysia, finding Q2 dominance — a pattern that contrasts with the
+Q1/Q2 subequal result of \citet{Huff1967} and likely reflects
+Malaysia's tropical maritime rainfall regime, in which multi-hour
+organised convection sustains peak intensities in the second quarter
+of storm time. In Europe, \citet{Dolsak2016} characterised temporal
+rainfall patterns at 30 stations across Slovenia's three climate
+zones (sub-Mediterranean, temperate continental, and mountain), showing
+that Huff curves from each zone were dissimilar from each other, from
+Illinois, from Malaysia, and from regional Brazilian curves — a result
+that underscores the strong sensitivity of curve shape to local
+climate. In east Asia, \citet{Liang2017} analysed minute-resolution
+records for Guangzhou, China, and found that 84\% of storms fall in
+Q1 or Q2, with the normalised time of peak rainfall at $33 \pm 5\%$
+of storm duration, pointing to a predominantly front-loaded regime
+consistent with intense tropical convection. In South America,
+\citet{Corrales2026} derived regionalized Huff curves for 270
+short-duration storms at automatic stations in the coastal-tropical
+Department of Magdalena, Colombia, identifying three dominant spatial
+storm types (early-peak, intermediate, and uniform) driven by the
+region's contrasting coastal, lowland, and orographic influences.
+
+Beyond their role as design-storm descriptors, Huff curves have been
+extended to several related applications. \citet{Bonta2004}
+demonstrated their utility for stochastic disaggregation of daily
+precipitation totals to sub-daily resolution, showing that
+hourly-resolution data produces Huff curves virtually identical to
+those derived from 3-minute records — a finding with important
+practical consequences for networks lacking fine-resolution
+instrumentation. \citet{Liang2017} proposed a modified Huff
+framework that replaces the four-quartile classification with
+separate polynomial descriptions of the rising and falling limbs of
+the storm mass curve, improving the representation of short-duration
+intense events in urban drainage design. More recently,
+\citet{Dunkerley2022} introduced an intensity threshold as an
+additional criterion for quartile assignment, arguing that the
+standard approach misclassifies events whose peak exceeds a
+physically relevant threshold in a different storm phase.
+Together, these extensions confirm that the Huff framework — while
+well established — continues to be refined as sub-daily observational
+networks expand.
+
+Brazil presents a particularly clear case for local calibration.
+With a territory of 8.5~million~km$^2$ spanning the equatorial
+Amazon basin, the semi-arid Caatinga, the tropical Cerrado savannah,
+the Atlantic Forest, the subtropical Pampa, and the Pantanal wetland,
+Brazil encompasses precipitation regimes driven by mechanisms as
+diverse as the Intertropical Convergence Zone (ITCZ), the South
+American Monsoon System (SAMS), the South Atlantic Convergence Zone
+(SACZ), and extratropical cold fronts \citep{Marengo2012}. In nearly
+all of these regimes, rainfall is predominantly produced by deep moist
+convection initiated by thermodynamic instability \citep{Zipser2006},
+rather than by the organised frontal systems that characterised much
+of the Illinois record.
+
+Regional Huff-curve derivations have been performed at scattered
+Brazilian sites. The first documented application was by the
+Departamento de Águas e Energia Elétrica of São Paulo state
+\citep{DAEE1983}, which applied the Huff (1967) curves directly
+without local calibration for the Alto Tietê macrodrainage plan.
+\citet{SantaCatarina2021} derived local curves from 1,039 events at
+Lages and 658 events at São Joaquim in the Santa Catarina mountain
+region, finding Q1 dominant (46.7\% of events) at both stations.
+\citet{Florianopolis2021} similarly reported Q1 dominance for the
+coastal city of Florianópolis. \citet{Abreu2017} used both Huff Q1
+and uniform distributions to construct design storms for the Gregório
+Creek watershed in São Carlos, São Paulo, quantifying the substantial
+hydrological sensitivity to the temporal pattern choice noted above.
+Taken together, these city- and watershed-scale studies consistently
+point toward Q1 dominance in southern Brazil, but none provides
+regional or national coverage, a consistent storm-selection protocol
+replicating \citet{Huff1967}, or a quantitative comparison against
+the Illinois reference across Brazil's diverse climate zones.
+
+The Agência Nacional de Águas e Saneamento Básico (ANA) operates a telemetric hydrometeorological monitoring network of more than 3,000 stations equipped with sub-daily rainfall gauges, providing an unprecedented opportunity to evaluate storm temporal structure across Brazil. This study uses that network to pursue three objectives:
+
+\begin{enumerate}
+	\item Derive national-scale empirical Huff curves for Brazil, using storm-selection criteria consistent with \citet{Huff1967}, and provide fitted curves at station, biome, state, and municipality scales.
+	
+	\item Quantify how Brazilian empirical Huff curves differ from the Huff (1967) Illinois reference, using mean absolute error (MAE), maximum absolute deviation ($D_\mathrm{max}$), and uncertainty bounds on the regional median curves.
+	
+	\item Identify the dominant storm-quartile patterns across Brazil and interpret their spatial, seasonal, and diurnal variability in relation to the climatic drivers of Brazilian rainfall.
+\end{enumerate}
+
+We further evaluate the robustness of these conclusions to the inter-event time definition (IETD), assess their engineering relevance through a controlled SCS-CN design-hydrograph experiment, and provide the resulting polynomial coefficients and design-storm products as open supplementary data and through an interactive web application.
+
+The paper is structured as follows. Section~\ref{sec:data} describes the study area, the ANA telemetric network, and the quality-control procedure. Section~\ref{sec:methods} details the event extraction, curve derivation, polynomial fitting, uncertainty quantification, IETD sensitivity analysis, design-hydrograph experiment, and web-application development. Section~\ref{sec:results} presents the national, biome-scale, spatial, robustness, and hydrological-impact results. Section~\ref{sec:discussion} interprets the dominant storm-quartile mechanism, compares the findings with prior studies, and discusses implications for Brazilian design-storm practice. Section~\ref{sec:conclusions} summarises the main findings.
+
+%%====================================================================
+\section{Study area and data}
+\label{sec:data}
+
+\subsection{Hydroclimatic setting}
+
+Brazil spans latitudes 5°N–34°S and longitudes 35°W–74°W — a
+continental territory of 8.5~million~km$^2$ encompassing six official
+biomes defined by the Instituto Brasileiro de Geografia e Estatística
+(IBGE): Amazônia, Caatinga, Cerrado, Mata Atlântica, Pampa, and
+Pantanal (Fig.~\ref{fig:casestudy}). The country's precipitation
+regime is governed by a complex interplay of large-scale atmospheric
+circulation systems, orography, and ocean–land thermal contrasts
+\citep{Marengo2012}.
+
+The Amazônia biome, covering approximately 49\% of the national
+territory, is characterised by an equatorial climate with year-round
+deep convection driven by high sea-surface temperatures in the tropical
+Atlantic, moisture recycling, and the seasonal migration of the
+Intertropical Convergence Zone (ITCZ). Annual precipitation totals
+typically exceed 2,000~mm, rising above 3,000~mm in the western
+Amazon. The wet season (November–April) is associated with the
+South American Monsoon System (SAMS) and the South Atlantic
+Convergence Zone (SACZ), which together channel moisture from the
+Amazon into southeastern Brazil. A distinct dry season occurs in
+June–August in the southern and eastern sectors of the biome.
+Despite its high annual total, much of the Amazon's rainfall is
+produced by intense organised convective systems — including mesoscale
+convective complexes — that generate some of the world's highest
+lightning flash densities \citep{Zipser2006}.
+
+The Caatinga, covering the semi-arid interior of the Northeast region,
+presents one of the most challenging rainfall regimes in Brazil.
+Total annual precipitation ranges from 300 to 800~mm, concentrated
+in a brief wet season (February–April) driven by the southward
+migration of the ITCZ. Events are rare but intense, often exceeding
+50~mm~h$^{-1}$, and the long dry season imposes severe constraints
+on the reliability of any sub-daily gauge record. The Cerrado, to
+the south and west, is a tropical savannah with a strongly bimodal
+annual cycle: a convective wet season from October to April, during
+which the interior plateau receives 70–80\% of its annual rainfall
+from afternoon mesoscale convective systems, followed by a near-total
+dry season from May to September. This high seasonality and the
+dominance of thermally forced convection make the Cerrado the biome
+most likely to produce front-loaded storm temporal patterns.
+
+The Mata Atlântica occupies the Atlantic coast from the far northeast
+to Rio Grande do Sul and encompasses the most complex storm
+climatology in Brazil. Its topography — the Serra do Mar rising
+abruptly from the coast to over 2,000~m within 50~km, and the
+Serra da Mantiqueira reaching 2,800~m — generates intense
+orographic enhancement during the wet season (October–March) and
+during the passage of frontal systems from the south. Sea-breeze
+circulations produce nocturnal rainfall maxima in coastal zones,
+while inland valleys experience afternoon convection. Cold fronts
+penetrating from the extratropics are the dominant forcing mechanism
+in winter (June–August) and account for a significant fraction of
+the annual total in the southern portion of the biome. This diversity
+of storm-generating mechanisms — convective, orographic, and frontal
+— produces a correspondingly diverse population of storm temporal
+patterns, making the Mata Atlântica the biome most likely to deviate
+from a single dominant quartile.
+
+The Pampa (southern Brazil, Rio Grande do Sul) and Pantanal (western
+Mato Grosso and Mato Grosso do Sul) represent the two smallest
+biomes. The Pampa has a subtropical climate with no pronounced dry
+season, high frequency of extratropical cyclone tracks from the
+southwest, and frontal rainfall distributed relatively uniformly
+through the year — the most Illinois-like climate in Brazil. The
+Pantanal is an extensive tropical wetland with highly concentrated
+summer convection (November–March, typically exceeding 1,200~mm)
+and a pronounced dry season. Its flat topography and high soil-moisture
+during the wet season allow deep convection to initiate readily,
+producing intense and short-lived convective storms.
+
+This diversity of climatic mechanisms, spanning equatorial deep
+convection, semi-arid ITCZ-driven events, tropical savannah
+afternoon convection, orographic and frontal rainfall, and
+extratropical storm tracks, makes Brazil a uniquely challenging
+and scientifically valuable test case for evaluating the
+transferability of the Huff (1967) Illinois reference across
+contrasting climatic regimes.
+
+\subsection{ANA telemetric network and data acquisition}
+
+Sub-daily rainfall data were downloaded from the ANA
+\textit{DadosHidrometeorologicos} SOAP endpoint
+(\url{https://telemetriaws1.ana.gov.br/ServiceANA.asmx}). The station
+catalogue comprised 3,164 stations distributed across all 26 Brazilian
+states and the Federal District. Data were retrieved for the period
+1 January 2010 to 31 December 2025 in 90-day chunks to comply with
+service limits.
+
+The ANA \textit{Chuva} field is treated as interval rainfall depth
+in millimetres, so that intensity is derived as $i = d / \Delta t$,
+where $d$ is the recorded depth and $\Delta t$ is the timestep
+inferred from the modal inter-record interval. The modal timestep was
+15~min for 371 stations (35.5\% of accepted stations), 30~min for 133
+(12.7\%), and 60~min for 541 (51.8\%).
+
+\subsection{Quality control}
+
+Each station time series was regularised onto a uniform time grid at
+its inferred timestep, after which four quality filters were applied.
+The first required a record span of at least four years, following
+\citet{BontaRao1988}, who demonstrated that this minimum is needed for
+stable percentile estimation in event-based Huff analyses. The second
+required the fraction of missing observations to remain at or below
+20\%, consistent with the World Meteorological Organization guideline
+that stations exceeding this threshold should be treated with caution
+for climatological analysis \citep{WMO2018}. The third rejected any
+station containing a near-complete calendar year — defined as one with
+at least 95\% valid records — that nonetheless reported zero total
+depth, since this pattern almost always indicates an instrument
+failure rather than a genuinely dry year. Finally, interval depths
+implying an intensity greater than 300~mm~h$^{-1}$ were set to missing
+as physically implausible for tipping-bucket gauges.
+
+Of the 3,164 stations, 1,045 (33.0\%) passed all filters
+(Supplementary Table~S1). The dominant failure cause was excessive
+missing data ($>$~20\%), affecting 93.1\% of the 2,086 rejected
+stations. The spatial distribution of accepted stations and their
+record lengths is shown in Fig.~\ref{fig:casestudy}.
+
+%%====================================================================
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Event extraction}
+\label{sec:event_extraction}
+
+Rainfall events were identified by applying an inter-event time
+definition (IETD) of 6~h to separate consecutive wet periods. This
+value replicates the storm-separation criterion of \citet{Huff1967}
+and is consistent with recommendations for humid climates by
+\citet{RestrepoPosada1982} and \citet{BontaRao1988}. The sensitivity
+of results to this choice is evaluated in Section~\ref{sec:ietd}.
+
+Within each extracted event, a minimum total depth of 12.7~mm
+(0.5~in) and a minimum of four records were required, again following
+\citet{Huff1967}. Events exceeding 96~h were excluded as multi-day
+synoptic features unlikely to represent a single storm. A maximum
+interval intensity of 300~mm~h$^{-1}$ was imposed as an additional
+outlier guard.
+
+\subsection{Huff curve derivation}
+
+For each qualifying event, the dimensionless cumulative mass curve
+was computed as:
+\begin{equation}
+  F(\tau_i) = \frac{\sum_{j=1}^{i} d_j}{\sum_{j=1}^{n} d_j},
+  \quad \tau_i = \frac{i}{n},
+  \label{eq:cdf}
+\end{equation}
+where $d_j$ is the rainfall depth at the $j$-th record, $n$ is
+the total number of records in the event, $\tau \in [0,1]$ is the
+normalised storm time, and $F \in [0,1]$ is the normalised cumulative
+depth. Quartile assignment followed \citet{Huff1967}: the event was
+classified as Q$k$ ($k = 1, 2, 3, 4$) according to the quarter of
+$[0, 1]$ in which the greatest incremental depth fell:
+\begin{equation}
+  k = \underset{k \in \{1,2,3,4\}}{\arg\max}
+        \left[ F\!\left(\tfrac{k}{4}\right) -
+               F\!\left(\tfrac{k-1}{4}\right) \right].
+\end{equation}
+
+All individual-event mass curves were interpolated onto a common
+$\tau$ grid with step 0.02 and the station median (50th-percentile)
+curve was computed for each quartile. Percentile envelopes
+(P10–P90 in 10-percentage-point steps) were also retained to
+characterise intra-station storm variability.
+
+\subsection{Polynomial fitting}
+\label{sec:poly}
+
+Median curves were represented by 7th-degree polynomials
+($\hat{F}(\tau) = \sum_{m=0}^{7} a_m \tau^m$) following the
+convention of \citet{Huff1967}. Coefficients were estimated by
+least-squares regression; polynomial values were subsequently
+clipped to $[0, 1]$ and monotonised to enforce the CDF property.
+The goodness of fit was uniformly $R^2 > 0.99$ at all spatial
+scales.
+
+\subsection{Goodness-of-fit metrics}
+\label{sec:metrics}
+
+Agreement between empirical and reference curves was quantified by
+two metrics evaluated at $\tau = 0.1, 0.2, \ldots, 1.0$ on the
+Huff (1967) reference grid:
+
+\begin{align}
+  \mathrm{MAE} &= \frac{1}{N} \sum_{i=1}^{N}
+                  \bigl| \hat{F}(\tau_i) - F_\mathrm{ref}(\tau_i) \bigr|,
+                  \label{eq:mae} \\
+  D_\mathrm{max} &= \max_{i} \bigl| \hat{F}(\tau_i)
+                   - F_\mathrm{ref}(\tau_i) \bigr|.
+                   \label{eq:dmax}
+\end{align}
+
+MAE is equivalent to the Wasserstein-1 (earth mover's) distance
+between the two distributions \citep{Villani2003} and directly
+quantifies the average pointwise departure in units of cumulative
+rainfall fraction. $D_\mathrm{max}$ is equivalent to the
+Kolmogorov–Smirnov (KS) test statistic \citep{Massey1951} and
+captures the worst-case departure at any storm phase — the quantity
+most critical for design applications.
+
+The Huff (1967) reference curves used for comparison were digitised
+from the published median (50th-percentile) distributions and
+represented as 7th-degree polynomials for computational evaluation.
+Endpoints were constrained to exactly $\{0, 1\}$ after polynomial
+evaluation.
+
+\subsection{Regional aggregation}
+
+Station median curves were aggregated to biome, state, and
+municipality levels by computing the median across contributing
+station curves at each $\tau$ point, then fitting a new 7th-degree
+polynomial to the regional median. Municipality-level curves with
+fewer than five contributing stations were flagged as unreliable.
+
+\subsection{Bootstrap uncertainty quantification}
+\label{sec:bootstrap}
+
+Regional curve uncertainty was quantified by bootstrapping over
+stations: $B = 2{,}000$ samples were drawn with replacement from the
+set of station median curves within each region, and the national or
+biome median curve was recomputed for each draw. The 2.5th and 97.5th
+percentiles across draws form the 95\% confidence interval on the
+regional median. Station-level uncertainty was approximated from the
+inter-event percentile spread (P10–P90) using the standard-error-of-
+the-median formula $\mathrm{SE} \approx 1.253\,\sigma/\sqrt{n}$,
+where $\sigma$ is estimated from the P10–P90 range and $n$ is the
+number of Q1 events at the station.
+
+\subsection{IETD sensitivity analysis}
+\label{sec:ietd_method}
+
+To evaluate robustness to the IETD choice, the full pipeline was
+re-executed at IETD $\in \{2, 4, 8, 12\}$~h in addition to the
+baseline of 6~h. Four metrics were evaluated across all five runs:
+(i) total qualifying event count and median event duration;
+(ii) event-level quartile fraction;
+(iii) station-level dominant-quartile agreement with the 6-h baseline;
+(iv) MAE and $D_\mathrm{max}$ of the national Q1–Q4 median curves
+relative to the Huff (1967) reference. All comparisons restrict the
+station set to the 1,045 accepted stations to isolate the effect of
+the IETD from changes in station membership.
+
+%%--------------------------------------------------------------------
+\subsection{Design-hydrograph sensitivity experiment}
+\label{sec:hydro_method}
+
+To translate the difference between the original and updated curves into
+an engineering-relevant quantity, we conducted a controlled
+design-hydrograph experiment in which a single factor — the temporal
+rainfall pattern — is varied while catchment, soil, terrain, design
+depth, and storm duration are held fixed. The change in peak discharge
+and in time-to-peak is therefore attributable solely to the hyetograph
+shape.
+
+The experiment is restricted to small headwater catchments in which the
+Soil Conservation Service curve-number (SCS-CN) method and the SCS
+dimensionless unit hydrograph are applicable
+\citep{NRCS2004, TR55_1986}. The SCS-CN method was developed for small,
+infiltration-excess (Hortonian) agricultural watersheds and is invalid
+where saturation-excess (variable-source-area) runoff dominates or where
+rainfall cannot be treated as spatially uniform. We therefore selected
+catchments from the HydroBASINS level-12 layer \citep{Lehner2013} using
+explicit eligibility criteria: drainage area between 5 and 250~km$^2$
+(small enough for a lumped unit hydrograph and uniform design rainfall);
+and biome membership restricted to the Cerrado, Caatinga, Mata
+Atlântica, and Pampa. The Amazônia and Pantanal biomes were excluded a
+priori because their low-gradient, saturation-excess and wetland runoff
+regimes violate the SCS-CN conceptual model. Of 30{,}866 eligible
+catchments, a stratified random sample of 150 per biome (600 total) was
+drawn.
+
+For each catchment, the time of concentration was estimated with the
+\citet{Kirpich1940} formula from the main-channel length — obtained from
+drainage area via Hack's law — and the channel slope, computed as the
+catchment relief (5th-to-95th-percentile elevation range) over the
+channel length using the Copernicus GLO-90 digital elevation model
+\citep{CopernicusDEM}. The design rainfall depth was taken from the gridded
+Sherman-type intensity–duration–frequency (IDF) surfaces of
+\citet{GomesJuniorIDF}, derived from the Brazilian Daily Weather
+Gridded Data (BR-DWGD; \citealt{Xavier2022}) and satellite records.
+The IDF model is $i = K\,T^{a}/(t+b)^{c}$, evaluated at the
+25-year return period for a storm duration equal to the time of
+concentration. The curve number (antecedent moisture condition II) was
+assigned from the catchment hydrologic soil group — derived from
+SoilGrids 250~m clay and sand fractions \citep{Poggio2021} via a
+texture-to-group classification — combined with the biome-characteristic
+land cover, using standard NRCS tables \citep{NRCS2004}.
+
+For each catchment the design hyetograph was constructed by
+differentiating the fitted cumulative Huff curve, converted to direct
+runoff with the SCS-CN loss model (initial-abstraction ratio 0.2), and
+convolved with the SCS dimensionless unit hydrograph (peak factor 484)
+to obtain the outlet hydrograph. This was done twice — once with the
+original Huff (1967) Q1 reference curve and once with the
+corresponding biome Q1 curve derived here — and the relative change in
+peak discharge, $\Delta Q_p$, and the shift in time-to-peak,
+$\Delta t_p$, were recorded. Because the loss model and unit hydrograph
+are identical in the two runs, systematic errors in curve number and
+time of concentration largely cancel, isolating the effect of the
+temporal pattern. The complete set of governing equations, the input
+datasets and their spatial fields, the catchment-eligibility criteria,
+and the curve-number assignment are documented in the Supplementary
+Material.
+
+%%--------------------------------------------------------------------
+\subsection{The Huff Curves BR Atlas: an interactive web application}
+\label{sec:webatlas}
+
+To maximise the practical impact and accessibility of the results, we
+developed a free, browser-based interactive application — the
+\emph{Huff Curves BR Atlas} — that exposes the complete station-level
+database derived in this study without requiring any software
+installation or programming expertise. The application is built as a
+lightweight client-side tool (HTML, CSS, and JavaScript with a Leaflet
+mapping engine); all 3,164 stations and 1,045 fitted curve sets are
+embedded directly in the page, so it runs entirely in the user's
+browser and can be hosted as a static site or opened from a local
+copy. A provisional deployment is available at
+\url{https://huff-curves-br.github.io/atlas/} (final URL to be
+confirmed on publication), and the source code and data are archived
+together with the analysis pipeline (see the Data availability
+statement).
+
+Figure~\ref{fig:webatlas}(a) shows the application interface, which is
+organised into three coordinated columns. The central panel is an
+interactive map of Brazil in which each station is plotted and
+colour-coded by its dominant Huff quartile, with marker size scaled
+to the number of valid rainfall events; the map supports pan, zoom,
+and click-to-select. The left column provides dataset-level summary
+statistics (total, accepted, and event counts) together with a set of
+filters and a free-text search box, allowing users to subset the
+network by processing status, dominant quartile, state, biome, minimum
+event count, or minimum record length. The right column displays the
+detailed record for the currently selected station, including its
+geographic and administrative metadata (municipality, state, region,
+and biome), data-quality diagnostics (record span, number of
+observations, missing fraction, inferred timestep, maximum daily and
+sub-daily rainfall), and the dominant quartile. Consistent with the
+methodology adopted throughout this study, station goodness-of-fit is
+reported as the mean absolute error (MAE) of the empirical curves
+relative to the Huff (1967) reference rather than as the
+Kling–Gupta efficiency, since the MAE has a direct interpretation in
+units of cumulative rainfall fraction (Section~\ref{sec:metrics}).
+
+For the selected station, the Atlas exposes the full set of analytical
+outputs derived in this study, each shown as a dedicated view in
+Fig.~\ref{fig:webatlas}(b)–(e). The empirical normalised Huff curves
+for all four quartiles are plotted together with the P10–P90 envelope
+of the dominant quartile (panel b), making the intra-station storm
+variability immediately visible. A design-storm module (panel c)
+reconstructs the hyetograph for any user-specified storm duration,
+total volume, and time step by differentiating the fitted cumulative
+curve, and overlays the corresponding cumulative mass curve; the
+resulting design storm can be downloaded as a CSV time series for
+direct use in hydrological models. The event-quartile composition and
+the per-quartile statistics of volume, duration, and intensity are
+presented as a chart and table (panel d), and the fitted 7th-degree
+polynomial coefficients for each quartile — the quantities required to
+reproduce the curves analytically — are tabulated alongside the
+governing equation (panel e).
+
+Through the Atlas, a practitioner or researcher can perform several
+tasks directly relevant to engineering and scientific applications:
+(i) locate the rain gauge nearest to a project site and inspect its
+empirical Huff curves and dominant quartile; (ii) compare the temporal
+rainfall behaviour of stations within a state, municipality, or biome
+by filtering and visually contrasting their quartile classifications;
+(iii) screen stations by data quality before adopting their curves for
+design, using the embedded record-length and missing-fraction
+diagnostics; (iv) retrieve the per-station polynomial coefficients and
+percentile curves needed to construct a locally calibrated design
+storm; and (v) export the filtered station table as a CSV file for
+offline analysis. By lowering the barrier between the national-scale
+results presented here and their use in routine hydrological practice,
+the Atlas is intended to encourage the replacement of the
+transplanted Huff (1967) Illinois reference with locally derived
+curves wherever Brazilian sub-daily data are available.
+
+
+%%====================================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{Station processing and event characteristics}
+
+Of the 3,164 stations in the ANA catalogue, 1,045 (33.0\%) passed
+all quality filters (Supplementary Table~S1). The dominant
+exclusion cause was missing data exceeding 20\% (93.1\% of rejected
+stations), reflecting the intermittent transmission characteristics
+of the telemetric network. An additional 33 stations (1.0\%) had no
+locally cached data.
+
+A total of 290,164 qualifying events were extracted from the 1,045
+accepted stations, corresponding to a median of 265 events per
+station (range: 8–777). Table~\ref{tab:events} summarises event
+characteristics by dominant quartile. Q1 events account for 43.6\%
+of all events; Q4 events are the least frequent at 13.1\%. Q1 events
+are systematically shorter (median duration 9.0~h vs.\ 13.0~h for
+Q4) and more intense (median peak intensity 20.4~mm~h$^{-1}$ vs.\
+15.0–16.0~mm~h$^{-1}$ for Q2–Q4). Median event volumes are nearly
+identical across quartiles (26.0–27.8~mm), confirming that quartile
+assignment captures the \emph{timing} of rainfall rather than its
+total depth.
+
+The seasonal distribution of events reveals a pronounced summer
+maximum: DJF contributes 38.9\% of all events, compared with only
+10.8\% in JJA (Table~\ref{tab:events}). The Q1 fraction varies
+seasonally from 45.4\% (DJF) to 33.6\% (JJA), the latter reflecting
+an increased role of organised frontal systems in austral winter.
+March records the highest monthly Q1 fraction (46.6\%) and August
+the lowest (32.7\%).
+
+\subsection{Diurnal cycle of event initiation}
+\label{sec:diurnal}
+
+Because the ANA records preserve the timestamp of every event, we also
+examined the hour of day at which events begin
+(Fig.~\ref{fig:diurnal}). Event initiation follows a pronounced diurnal
+cycle: across all 290,164 events, the rate of initiation is lowest in
+the late morning and rises to a sharp maximum at a modal start hour of
+15~h, so that 35.3\% of events begin in the afternoon window
+(12–18~h) against only 18.6\% in the morning (06–12~h)
+(Fig.~\ref{fig:diurnal}a). The absolute clock hours follow the
+recording convention of the ANA telemetric network and are not
+adjusted for the several time zones spanned by the country; the
+\emph{relative} timing across quartiles described below is, however,
+invariant to any uniform offset.
+
+The diurnal signal varies systematically and monotonically with the
+dominant quartile (Fig.~\ref{fig:diurnal}b). The modal start hour
+advances by a full hour per quartile, from 16~h for Q1 to 15~h, 14~h,
+and 13~h for Q2, Q3, and Q4 respectively, while the fraction of events
+beginning in the morning rises in the same order, from 14.1\% for Q1 to
+20.5\%, 22.5\%, and 24.3\% for Q2–Q4. First-quartile (front-loaded)
+storms are thus the latest-peaking and the least likely to begin in the
+morning, whereas fourth-quartile (back-loaded) storms are the earliest
+and most morning-prone. This ordered gradient links the quartile
+classes to a common diurnal driver and is interpreted further in
+Section~\ref{sec:mechanism}.
+
+\subsection{National Huff curves}
+\label{sec:national}
+
+Fig.~\ref{fig:national} shows the national empirical Huff curves for
+Q1–Q4, including the inter-station P10–P90 range, the bootstrap 95\%
+confidence interval on the national median, and the Huff (1967)
+reference. Q1 is the dominant quartile at 986 of the 1,045 accepted
+stations (94.4\%); Q2, Q3, and Q4 account for 2.0\%, 0.9\%, and
+2.8\%, respectively.
+
+The national Q1 median curve lies above the Huff (1967) reference
+throughout $\tau \in [0.1, 0.9]$, indicating that Brazilian Q1
+storms accumulate a larger fraction of their total depth earlier in
+the storm than the Illinois reference. The national Q1 MAE is 0.045
+and $D_\mathrm{max}$ is 0.097; at the median $\tau = 0.5$, the
+empirical curve reaches $F = 0.86$ compared with $F = 0.82$ for the
+reference — a difference of four percentage points of storm total.
+Bootstrap uncertainty is small: the mean 95\% CI width across
+$\tau$ points is 0.006 for Q1, confirming that the national median
+is precisely estimated despite inter-station variability.
+
+For Q2, Q3, and Q4, the national median curves lie close to their
+respective Huff (1967) references (national MAE: 0.042, 0.042, and
+0.036 respectively), with the largest absolute deviations occurring
+in the middle of the storm ($\tau \approx 0.4$–$0.6$). The broader
+P10–P90 ranges for Q2–Q4 reflect higher intra-station variability in
+storms where the peak is not concentrated in the first quarter.
+
+\subsection{Biome-scale results}
+\label{sec:biome}
+
+Fig.~\ref{fig:biome} and Table~\ref{tab:biome} present Q1 curve
+characteristics at the biome scale. Q1 is the dominant quartile in
+all six biomes, with station fractions ranging from 88.7\% in the
+Mata Atlântica to 100\% in the Pantanal. The agreement with the Huff
+(1967) reference, however, varies systematically across the biomes
+in a manner that closely tracks their underlying storm climatology.
+
+The Amazônia biome (132 stations, 50,299 events) is strongly
+Q1-dominant at 99.2\% of stations, but its median curve shows the
+largest positive departure from the Illinois reference of any biome
+(MAE = 0.063, $D_\mathrm{max}$ = 0.121), lying well above it
+throughout the storm. This reflects the high convective available
+potential energy of the equatorial Amazon, where deep convective
+cells release the bulk of their rainfall rapidly after initiation.
+The Caatinga (49 stations, 6,491 events) behaves similarly, with a
+Q1 fraction of 98.0\% and comparable departures from the reference
+(MAE = 0.059, $D_\mathrm{max}$ = 0.112); despite the small station
+count, its Q1 dominance is robust across all tested inter-event time
+definitions ($\geq$~95.9\% for IETD~$\geq$~4~h), consistent with the
+rare but intense and short-lived storms produced by the seasonal
+migration of the Intertropical Convergence Zone. The Cerrado,
+the largest biome in the dataset by event count (348 stations,
+85,521 events), is the most uniformly Q1-dominant of the continental
+biomes (99.7\%; MAE = 0.060, $D_\mathrm{max}$ = 0.114), reflecting
+the near-exclusive role of afternoon thermally driven convection over
+its flat interior plateau in producing consistently front-loaded mass
+curves.
+
+The two biomes most influenced by extratropical and orographic
+forcing depart from this pattern in opposite directions. The Mata
+Atlântica (488 stations, 141,356 events) has the lowest Q1 fraction
+of all biomes at 88.7\%, yet paradoxically the best agreement with
+the Huff reference (MAE = 0.028, $D_\mathrm{max}$ = 0.042; bootstrap
+95\% CI width at $\tau = 0.5$ of 0.007). Both features stem from the
+same cause: the diversity of storm types in this biome — orographic
+rainfall along the Serra do Mar, sea-breeze-driven nocturnal events,
+and cold fronts arriving from the south — generates a substantial
+minority of Q2–Q4 storms and, for the Q1 population that remains, a
+median curve closer to the more gradual Illinois shape. The Pampa
+(23 stations, 4,913 events) shows the closest match to the Illinois
+reference of any biome (MAE = 0.019, $D_\mathrm{max}$ = 0.062) while
+retaining a high Q1 fraction of 95.7\%; its extratropical regime most
+closely resembles the mid-latitude climate sampled by \citet{Huff1967}.
+Finally, the Pantanal (5 stations, 1,584 events) is Q1-dominant at
+every station and every IETD value (MAE = 0.058, $D_\mathrm{max}$ =
+0.115), although its small station count means these results are
+indicative only.
+
+\subsection{Spatial patterns}
+\label{sec:maps}
+
+The dominant quartile at each of the 1,045 accepted stations is mapped
+in Fig.~\ref{fig:map_q}. Q1-dominant stations are distributed
+essentially uniformly across the national territory, spanning the
+equatorial Amazon, the semi-arid Northeast, the central Cerrado, and
+the subtropical south without any pronounced regional gradient. This
+spatial homogeneity is itself a key result: it indicates that the
+front-loaded storm structure is not a feature of one particular
+climate zone but a pervasive characteristic of Brazilian heavy
+rainfall. The few stations classified as Q2, Q3, or Q4 do not form
+large contiguous clusters; the only discernible spatial signal is a
+modest concentration of Q4 (late-peaking) stations along the southern
+Pampa and the coastal Mata Atlântica, precisely the two regions where
+extratropical cold fronts most frequently produce longer, more
+symmetric or back-loaded rainfall sequences.
+
+The dominant-quartile classification reduces each station to its modal
+class and therefore conceals the underlying composition of the event
+population. Mapping the full distribution — the share of each station's
+events in every quartile (Fig.~\ref{fig:quartile_percent}) — shows that
+the composition is remarkably stable nationally but varies
+systematically with biome in a way the dominant-quartile map cannot
+resolve. The first-quartile share is highest in the convective biomes,
+with biome-median values of 50.8\% (Pantanal), 49.6\% (Caatinga),
+48.3\% (Cerrado), and 46.1\% (Amazônia), and lowest in the two
+extratropical biomes, 41.2\% (Mata Atlântica) and 41.4\% (Pampa).
+The deficit in Q1 in the south is taken up almost entirely by the
+second and third quartiles, whose combined biome-median share rises
+from about 40\% in the convective interior to 45–47\% in the Mata
+Atlântica and Pampa, while the fourth-quartile share remains nearly
+constant (10.6–11.9\%) across all biomes. In other words, the
+north-to-south transition from convective to frontal regimes is
+expressed not as a switch in the dominant quartile — which remains Q1
+almost everywhere — but as a gradual transfer of probability mass from
+the first quartile into the mid-storm quartiles.
+
+The spatial distribution of the goodness-of-fit metrics, computed
+separately for each quartile (Fig.~\ref{fig:map_mae}), reveals two
+superimposed and consistent patterns. The first is a coherent
+north–south geographic gradient that is present in every quartile: the
+lowest MAE and $D_\mathrm{max}$ values — the closest agreement with the
+Huff (1967) reference — are concentrated in the south and southeast,
+consistent with the climatically more Illinois-like conditions of the
+Pampa and the southern Mata Atlântica, whereas the highest values occur
+in the Amazon interior and parts of the Caatinga, where intense
+tropical convection drives the empirical curves furthest from the
+reference. At the biome level the median MAE for Mata Atlântica and
+Pampa remains below 0.035 for all four quartiles, against 0.05–0.08 for
+Amazônia, Caatinga, and Pantanal.
+
+The second pattern is a systematic dependence on the quartile itself.
+The empirical curves match the reference best for the second quartile
+and worst for the fourth: nationally, the median MAE rises from 0.043
+(Q2) to 0.047 (Q4) and the median $D_\mathrm{max}$ from 0.085 (Q2) to
+0.103 (Q4), with Q1 and Q3 intermediate. This Q4 deterioration is
+strongest precisely in the convective biomes — in Amazônia the median
+Q4 $D_\mathrm{max}$ reaches 0.175, by far the largest departure of any
+biome–quartile combination, compared with 0.108 for its Q2. The
+back-loaded fourth-quartile pattern is therefore both the rarest
+(13.1\% of events; Section~\ref{sec:national}) and the least
+well-described by the Illinois reference in the regions where
+convection dominates. The two effects compound: agreement with the
+Huff (1967) curves is highest for the early- and mid-peaking storms of
+the extratropical south, and lowest for the late-peaking storms of the
+deep tropics.
+
+\subsection{IETD sensitivity}
+\label{sec:ietd}
+
+Table~\ref{tab:ietd} and Fig.~\ref{fig:ietd} summarise the
+sensitivity analysis across five IETD values, which together
+demonstrate that the principal conclusions of this study are robust
+to the choice of inter-event separation.
+
+The station-level dominant-quartile classification is highly stable.
+Across all five IETD values from 2 to 12~h, 84.7\% of the 1,045
+stations retain the same dominant quartile, and agreement with the
+6-h baseline reaches 96.3\% at IETD = 4~h and 97.1\% at IETD = 8~h,
+so that the $\pm$2~h bracket around the chosen value changes the
+classification of only about 3\% of stations. The sensitivity that
+does exist is concentrated in the two biomes with the most diverse
+storm populations: the Mata Atlântica and the Pampa, whose Q1
+fractions rise from 71.7\% and 78.3\% at IETD = 2~h to 96.9\% and
+100\% at 12~h. The Amazônia, Cerrado, and Caatinga biomes, dominated
+by short convective cells, are essentially invariant above IETD = 4~h.
+
+The total number of qualifying events is itself maximised at the
+chosen value. Event count peaks at 290,164 for IETD = 6~h and declines
+on either side — to 269,768 at 2~h, as short inter-event gaps split
+storms into sub-events that individually fall below the 12.7~mm
+minimum depth, and to 279,484 at 12~h, as excessive merging reduces
+the number of discrete storms. This interior maximum provides an
+independent, data-driven justification for the 6-h choice beyond the
+literature precedent discussed in Section~\ref{sec:event_extraction}.
+
+Finally, the agreement between the empirical curves and the Huff
+(1967) reference degrades monotonically as the IETD lengthens: the
+national Q1 MAE increases from 0.032 at IETD = 2~h to 0.057 at 12~h.
+The mechanism is physical: at longer separations, merged events
+increasingly incorporate stratiform trailing rainfall that flattens
+the early rise of the cumulative mass curve and so moves it away from
+the sharply front-loaded Huff Q1 shape. This behaviour provides an
+objective, rather than merely conventional, basis for preferring
+short-to-moderate IETD values in this application, with IETD = 6~h
+representing the best available compromise between maximising the
+qualifying event count and preserving fidelity to the reference curve.
+
+\subsection{Impact on design peak discharge}
+\label{sec:hydro_results}
+
+The design-hydrograph experiment quantifies the engineering consequence
+of replacing the imported Illinois reference with the locally derived
+curves (Fig.~\ref{fig:hydro}). Across the 579 SCS-eligible catchments
+for which all inputs were available, adopting the updated biome Q1 curve
+\emph{increases} the design peak discharge relative to the original Huff
+(1967) Q1 curve at every catchment, by a national median of 7.7\%
+(interquartile range 6.2–9.5\%). The sign is consistent and physically
+expected: because the Brazilian Q1 curves are systematically steeper
+than the Illinois reference (Section~\ref{sec:national}), they deliver a
+larger fraction of the storm depth in the first quarter, producing a
+flashier hydrograph with a higher and earlier peak.
+
+The magnitude of the effect follows the same convective-to-frontal
+gradient seen throughout the analysis (Fig.~\ref{fig:hydro}b). The
+increase is largest in the convective interior — a median of 11.2\% in
+the Cerrado and 9.3\% in the Caatinga — and smallest in the more
+Illinois-like extratropical south, 6.7\% in the Mata Atlântica and 5.1\%
+in the Pampa. In other words, the imported curves underestimate design
+peaks most severely precisely where the local storm climatology departs
+furthest from Illinois, exactly as the goodness-of-fit maps
+(Fig.~\ref{fig:map_mae}) would predict. The time-to-peak shifts
+correspondingly (Fig.~\ref{fig:hydro}c): the more front-loaded updated
+curves advance the peak by a median of about 0.6~h in the Cerrado and
+Caatinga, leave it essentially unchanged in the Mata Atlântica, and
+delay it slightly (about 0.4~h) in the Pampa, whose Q1 curve is the
+closest of all biomes to the reference. The tight within-biome spread of
+$\Delta Q_p$, obtained despite real catchment-to-catchment variation in
+soil-derived curve number, time of concentration, and design depth,
+indicates that the result is governed by the curve shape rather than by
+the other model inputs.
+
+%%====================================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Mechanism of Q1 dominance}
+\label{sec:mechanism}
+
+Two distinct measures of Q1 prevalence must be carefully distinguished
+before comparing our results with the literature, because they answer
+different questions and take very different numerical values. The
+\emph{event-level} Q1 fraction is the proportion of individual storms
+classified as first-quartile, and equals 43.6\% nationally
+(Table~\ref{tab:events}). The \emph{station-level} Q1 dominance is the
+proportion of stations whose single most frequent quartile is Q1, and
+equals 94.4\% (Section~\ref{sec:national}). The two differ because, at
+the great majority of stations, Q1 is the modal class even though it
+accounts for well under half of that station's events: with a typical
+split on the order of 44\% Q1 against 24\%, 19\%, and 13\% for Q2–Q4,
+Q1 is almost always the largest single group without being an absolute
+majority. The 94.4\% figure therefore does \emph{not} imply that 94\%
+of Brazilian storms are front-loaded; it states that front-loaded
+storms are the most common type at 94\% of gauges.
+
+Interpreted on a like-for-like basis, our results are consistent with
+the international literature at the event level while extending it
+substantially in spatial scope. Our event-level Q1 fraction of 43.6\%
+is modestly higher than the 30\% reported by \citet{Huff1967} for
+Illinois and closely matches the 44.7–46.7\% found by
+\citet{SantaCatarina2021} in southern Brazil (see
+Section~\ref{sec:comparison} for a full comparison). What is genuinely
+new is the near-universal \emph{station-level} dominance of Q1 across a
+continental and climatically diverse territory — a pattern that has not
+previously been documented at national scale and that we propose
+reflects a fundamental commonality in storm-generating mechanism.
+
+Across most Brazilian biomes, rainfall is driven by deep moist
+convection initiated by diurnal surface heating \citep{Marengo2012},
+and the diurnal cycle of event initiation documented in
+Section~\ref{sec:diurnal} (Fig.~\ref{fig:diurnal}) provides direct
+empirical support for this mechanism. The afternoon maximum in event
+initiation is the signature expected of thermally driven convection, in
+which surface heating builds convective available potential energy
+through the morning and triggers intense, relatively short storms
+(median Q1 duration $\leq$~9~h) in the afternoon, concentrating the bulk
+of storm depth in the first quarter of normalised time. Most
+tellingly, the diurnal signal strengthens monotonically with the degree
+of front-loading: first-quartile storms peak latest in the day and are
+the least likely to begin in the morning, whereas back-loaded
+fourth-quartile storms peak earliest and most often begin in the
+morning. Because this ordering across quartiles is invariant to the
+absolute clock convention of the ANA records, it constitutes robust
+internal evidence that the front-loaded Q1 storms are the most direct
+expression of afternoon convective forcing. The interpretation is
+further consistent with the fact that South America hosts some of the
+world's most intense continental thunderstorms \citep{Zipser2006},
+matching the steep early rise of the Brazilian Q1 curves relative to
+the Illinois reference.
+
+The seasonal signal supports this interpretation: the Q1 fraction
+drops from 45.4\% (DJF, austral summer — peak convective season)
+to 33.6\% (JJA, austral winter). In winter, extratropical cold fronts
+penetrate into southern Brazil and weaken the SACZ, shifting the storm
+population towards more organised, longer-duration systems that
+distribute rainfall more evenly in time — producing Q2 and Q3
+patterns. The monthly trough in Q1 fraction (32.7\% in August)
+coincides with maximum cold-front frequency in southern Brazil.
+
+Biome differences are consistent with this framework. The Cerrado
+(99.7\% Q1) experiences almost exclusively afternoon convective
+storms over a flat interior plateau with high CAPE; the Mata Atlântica
+(88.7\% Q1) has the most diverse storm population, including
+orographic events along the escarpment, sea-breeze-driven nocturnal
+rainfall, and frontal systems, all of which can produce non-Q1 mass
+curves. The Pampa (95.7\% Q1), despite being the most extratropical
+biome, still shows Q1 dominance because the long-duration frontal
+events that might produce Q2–Q4 patterns are filtered out by the
+12.7~mm minimum depth and the 6-h IETD: only the most intense cells
+within frontal bands qualify, and these tend to produce front-loaded
+hyetographs. The per-station quartile composition
+(Fig.~\ref{fig:quartile_percent}) makes the same mechanism visible as a
+continuous gradient rather than a binary dominance: the convective
+biomes carry the largest first-quartile shares (46–51\%), and the
+extratropical Mata Atlântica and Pampa redistribute roughly five
+percentage points of that mass into the second and third quartiles,
+exactly the signature of an increasing frontal and stratiform
+contribution to mid-storm rainfall.
+
+The systematic positive departure of Brazilian Q1 curves from the
+Huff (1967) reference ($F_\mathrm{Brazil} > F_\mathrm{Illinois}$
+for $\tau < 0.8$) reinforces the convective interpretation: Brazilian
+storms not only peak in Q1 more frequently, but within Q1 they
+accumulate rainfall faster than the Illinois reference. The Pampa
+shows the smallest departure (MAE = 0.019), consistent with its more
+Illinois-like climate.
+
+\subsection{Comparison with prior studies}
+\label{sec:comparison}
+
+Placing our results alongside the international and Brazilian
+literature requires comparing the same quantity — the event-level
+quartile composition — rather than the station-level dominance figure
+discussed above. Table~\ref{tab:comparison} assembles the reported
+quartile results from the principal published derivations, normalised
+where possible to the fraction of events in each quartile.
+
+At the event level, our national Q1 fraction of 43.6\% sits within the
+range of previous work and is fully consistent with the only
+comparable Brazilian study. \citet{Huff1967} reported quartile
+frequencies of 30\%, 36\%, 19\%, and 15\% for Q1–Q4 in Illinois, so
+that Q1 and Q2 were jointly dominant and Q2 was in fact the single most
+frequent class — a temperate-climate pattern in which organised and
+frontal systems contribute a substantial share of back-loaded storms.
+\citet{SantaCatarina2021} derived Huff curves for two stations in the
+mountain region of Santa Catarina (Lages and São Joaquim) and found Q1
+the most frequent class at 46.7\% and 44.7\% of events respectively,
+with the remaining events distributed across Q2 (around 28\%), Q4
+(around 13\%), and Q3 (around 12\%); these values are very close to our
+national event-level split and, like ours, place Q1 as the modal class
+without an absolute majority. \citet{Florianopolis2021} similarly
+reported Q1 (Type I) as the predominant pattern for the coastal city
+of Florianópolis.
+
+The contrast with the tropical-Asian studies is instructive. In
+Peninsular Malaysia, \citet{AzliRao2010} found Q2 rather than Q1 to be
+the most frequent class across roughly 5,800 storms, which they
+attributed to the prevalence of multi-hour organised convection that
+sustains peak intensities into the second quarter of storm time. For
+Guangzhou, China, \citet{Liang2017} reported that 84\% of storms fall
+in Q1 or Q2 combined, with the normalised time of peak rainfall at
+$33 \pm 5\%$ of storm duration — a front-loaded regime broadly
+comparable to ours but reported as a combined Q1+Q2 figure rather than
+a pure Q1 fraction. These differences reinforce the central message of
+this study: the dominant temporal pattern is climate-specific, and the
+Q1 prevalence we document for Brazil cannot be assumed a priori from
+results obtained in other tropical or temperate regions.
+
+The earlier DAEE (1983) analysis for the Alto Tietê basin in São Paulo
+applied the Huff (1967) curves directly without a local derivation,
+which our results suggest may have underestimated the steepness of the
+Q1 curve in that subtropical convective environment. Taken together,
+our study extends the isolated Brazilian site studies to a national
+scale with two to three orders of magnitude more stations and events,
+and is the first to show that the Q1 dominance previously noted at
+individual southern-Brazilian sites is a continental rather than local
+phenomenon.
+
+\subsection{Quartile dependence of the fit to the Huff reference}
+\label{sec:quartile_fit}
+
+Mapping the goodness-of-fit metrics quartile by quartile
+(Fig.~\ref{fig:map_mae}) exposes a systematic structure that the
+aggregate Q1 view conceals, and that has a coherent physical
+interpretation. Two effects act together. Geographically, agreement
+with the Huff (1967) reference weakens monotonically from the
+extratropical south toward the deep tropics in every quartile, mirroring
+the biome gradient already noted for the Q1 curves: the storm
+population of the Pampa and southern Mata Atlântica, where frontal and
+mixed systems resemble the Illinois sampling conditions, is described
+well by the reference, whereas the intense convective storms of
+Amazônia and the Caatinga depart from it most strongly.
+
+Superimposed on this geographic gradient is a consistent ordering among
+the quartiles themselves. Across the national network the second
+quartile is reproduced best (median $D_\mathrm{max}$ = 0.085) and the
+fourth quartile worst (median $D_\mathrm{max}$ = 0.103), with Q1 and Q3
+intermediate. The deterioration of the Q4 fit is concentrated in the
+convective biomes and is pronounced — the median Q4 $D_\mathrm{max}$
+reaches 0.175 in Amazônia, the single largest biome–quartile departure
+in the dataset. We interpret this as a direct consequence of the same
+convective mechanism that drives the national Q1 dominance. Where deep
+afternoon convection prevails, genuinely back-loaded storms are both
+uncommon and physically atypical: a Q4 classification in such a regime
+tends to arise from compound or stratiform-trailing events whose mass
+curve is poorly approximated by the smooth, strongly back-loaded Huff
+Q4 reference. By contrast, in the extratropical south, where frontal
+systems routinely generate late-peaking rainfall, the Q4 curves are
+both better populated and closer to the reference. The second quartile,
+representing a near-central and ubiquitous storm shape, is the most
+transferable across climates. This quartile dependence reinforces the
+central conclusion of the study: a single transplanted reference is
+least adequate exactly where the local storm climatology is most
+distinct, and the case for locally derived curves is therefore
+strongest for the off-modal quartiles and the convective biomes.
+
+\subsection{Practical implications for Brazilian design-storm practice}
+
+The results have direct implications for urban drainage design,
+stormwater management, and flood modelling in Brazil. The Huff (1967)
+Illinois Q1 reference — widely used as a default in Brazilian practice
+— under-predicts the cumulative fraction of storm depth reaching the
+drainage system in the first quarter of storm time by approximately
+four percentage points nationally (median $\tau = 0.5$: empirical
+0.86 vs. reference 0.82). Although seemingly small in absolute terms,
+the design-hydrograph experiment (Section~\ref{sec:hydro_results},
+Fig.~\ref{fig:hydro}) shows that this difference translates into a
+systematic underestimation of design peak discharge by the imported
+curves of about 8\% nationally, and as much as 11\% in the convective
+Cerrado, together with an advance of the time-to-peak of roughly half
+an hour in the convective interior. Errors of this magnitude propagate
+directly into the sizing of culverts, channels, and detention
+structures, and they act in the unconservative direction — the
+transplanted reference under-predicts the peak — so their correction is
+of practical consequence for flood-risk infrastructure.
+
+It is worth examining why the updated curves produce higher design peaks
+at \emph{every} catchment in the experiment with no exception.
+This consistency is not a numerical artefact but a direct consequence
+of the central climatological finding: every Brazilian biome Q1
+median curve lies \emph{pointwise above} the Huff (1967) Illinois Q1
+reference across the full range of normalised storm time $\tau$
+(Fig.~\ref{fig:national}), meaning that the local pattern delivers a
+larger cumulative fraction of storm depth before any given moment
+than the imported reference does.
+Because all comparisons use the biome-level \emph{median} Q1 curve
+against the Illinois \emph{median} Q1 curve, the ordering of the two
+curves is fixed before the hydrological calculation begins; the
+design-hydrograph experiment then translates that fixed ordering into
+a peak-discharge difference whose magnitude depends on catchment
+properties but whose sign is already determined.
+Under individual station Q1 curves — which exhibit station-to-station
+scatter around the biome median — a small fraction of catchments would
+likely yield negligible or even slightly negative $\Delta Q_p$,
+particularly in the southern Mata Atlântica and Pampa where the
+local curves most closely approach the Illinois reference
+(biome $D_\mathrm{max}$ = 0.042 and 0.062, respectively).
+The engineering implication is that, at the biome- or state-median
+level, the use of the Illinois reference in Brazil is consistently
+unconservative: it systematically underestimates design peaks in the
+SCS-CN framework, with a bias gradient that grows from south to north
+as the climate departs further from the Illinois temperate reference.
+Engineers should therefore apply the locally derived curves not only
+where the curves differ most from the reference (Amazônia, Caatinga,
+Cerrado) but also in the extratropical south, where the difference is
+smaller yet still directionally unconservative.
+
+The polynomial coefficient tables provided at biome, state, and
+municipality levels (Supplementary data) offer a locally calibrated
+alternative. State-level curves are available for all 27 Brazilian
+administrative units and are recommended for engineering applications
+where biome-level aggregation is too coarse. Municipality-level curves
+are available for 694 municipalities but are considered reliable (here
+defined as $n \geq 5$ stations) for only 19 of these; the remainder
+should be treated as preliminary estimates.
+
+Practitioners should note that the 50th-percentile (median) curves
+are appropriate for mean-behaviour design, while the P10 and P90
+envelopes (available in the supplementary long-form curve tables)
+correspond roughly to the conservative and liberal bounds.
+
+\subsection{Data quality and methodology considerations}
+
+The most consequential methodological decision in this study is the
+minimum storm depth of 12.7~mm (replicating Huff, 1967). Our IETD
+sensitivity analysis confirms that the dominant findings are robust
+across a wide range of IETD values, but the minimum depth threshold
+was not varied: raising it would further restrict the event population
+to the most intense storms and might shift the Q1 fraction upward, while
+lowering it to 1~mm (a common default in sub-daily rainfall processing)
+would include drizzle events that may not represent the heavy storms
+relevant to design.
+
+The mixed temporal resolution of the station network (51.8\% at
+60~min) is an acknowledged limitation. While Q1 dominance is
+consistent across all three resolution classes (97.8\% at 15~min,
+92.8\% at 60~min), the 60-min stations cannot capture events shorter
+than four hours, potentially missing the most intense convective cells
+that would most strongly reinforce Q1 dominance.
+
+\subsection{Limitations}
+\label{sec:limitations}
+
+Several limitations qualify the results presented here. The most
+important concerns spatial coverage: station density is substantially
+lower in the Amazon interior and the semi-arid Northeast than in the
+densely instrumented south and southeast, so the curves for the
+under-sampled regions, and particularly the Pantanal ($n = 5$
+stations), should be regarded as indicative rather than definitive.
+A second limitation arises from the mixed temporal resolution of the
+network, in which 51.8\% of accepted stations record at 60-minute
+intervals and therefore cannot resolve sub-hourly rainfall structure;
+although the dominant-quartile classification is stable across
+resolution classes, the curves at coarse-resolution stations
+necessarily represent somewhat longer events. The analysis also
+relies on a single data source — the ANA telemetric network — without
+cross-validation against the INMET automatic stations, the CEMADEN
+sub-hourly gauges, or radar precipitation estimates, each of which may
+carry different sampling and missing-data characteristics.
+
+Three further limitations concern the temporal and methodological
+scope of the study. Because the derived curves represent the
+2010–2025 climatological period, they assume stationarity and do not
+capture any long-term trend in storm temporal structure, which may be
+relevant for design horizons extending decades into the future. A
+single inter-event time definition of 6~h was applied uniformly across
+the country; while the sensitivity analysis shows that the principal
+findings are robust to this choice, region-specific IETD calibration
+may nonetheless refine the curves in climatically distinct biomes.
+The municipality-level products must be used with care, since
+97.3\% of municipalities are represented by fewer than five accepted
+stations and their curves consequently carry substantial uncertainty.
+
+Finally, the design-hydrograph experiment is deliberately a screening
+exercise rather than a calibrated flood study, and its scope is bounded
+by the validity envelope of the SCS-CN method. It applies only to small,
+infiltration-excess headwater catchments (5–250~km$^2$) in the Cerrado,
+Caatinga, Mata Atlântica, and Pampa; the Amazônia and Pantanal biomes
+were excluded a priori because their saturation-excess and wetland
+runoff regimes lie outside the SCS-CN conceptual model, so the
+experiment is not national in coverage. The reported changes are
+relative comparisons in which the curve number, time of concentration,
+and unit hydrograph are held identical between the two runs; this
+isolates the temporal-pattern effect and causes systematic errors in
+those inputs to cancel, but the absolute peak magnitudes are not
+calibrated against observed hydrographs and should not be interpreted as
+design values. The choice of time-of-concentration formula, curve-number
+table, and unit-hydrograph shape would shift the absolute peaks but, as
+relative-comparison factors, has limited influence on the reported
+$\Delta Q_p$.
+
+A subtler limitation relates to how the SCS-CN model handles
+the temporal distribution of rainfall and runoff generation.
+In the SCS-CN formulation, total storm runoff $Q$ is a function of
+total rainfall depth $P$ and the curve number alone
+($Q = (P - I_a)^2 / (P - I_a + S)$); it is independent of how
+rainfall is distributed within the storm.
+Consequently, the total runoff volume — and hence the runoff
+coefficient $RC = Q/P$ — is identical for both the reference and the
+locally derived Huff patterns, even though the hyetograph shapes differ
+substantially.
+The temporal pattern manifests only in the \emph{timing} of runoff
+generation: a front-loaded Brazilian Q1 curve satisfies the initial
+abstraction earlier, concentrating effective rainfall in the first
+quarter of storm time and thereby driving the higher and earlier peaks
+documented here.
+This is a known conceptual constraint of the SCS-CN approach, which
+lacks an infiltration-capacity mechanism linking rainfall intensity to
+overland-flow generation.
+In more physically-based rainfall–runoff frameworks — such as
+Green–Ampt, Philip, or continuous soil-moisture accounting models — the
+temporal distribution of rainfall is expected to influence total runoff
+generation as well, because high early intensities can exceed the
+soil's infiltration capacity even when the total depth would not
+produce excess under a uniform distribution.
+Whether the systematic front-loading of Brazilian storms relative to
+the Illinois reference translates into additional runoff volume beyond
+what the SCS-CN model captures is an open question that warrants
+investigation with event-based continuous simulations or
+infiltration-capacity models calibrated to Brazilian soils.
+
+%%====================================================================
+\section{Conclusions}
+\label{sec:conclusions}
+
+This study presents the first national-scale derivation of empirical
+Huff curves for Brazil, using 290,164 qualifying storm events
+extracted from 1,045 ANA telemetric rain-gauge stations over the
+period 2010–2025.
+
+The central finding is that the first quartile is the dominant storm
+pattern across the entire country: 94.4\% of stations are Q1-dominant,
+reflecting Brazil's predominantly thermally driven convective rainfall
+regime. This preponderance is remarkably robust, holding across all
+six IBGE biomes, across the three data-collection timesteps present in
+the network (15–60~min), and across a six-fold range of inter-event
+time definitions (2–12~h). Crucially, however, the Brazilian Q1 curves
+are systematically steeper than the Huff (1967) Illinois reference:
+the national Q1 median curve exceeds the reference by up to
+$\Delta F = 0.097$ in maximum absolute deviation, with the largest
+positive departures occurring in the Amazônia and Cerrado biomes,
+which are dominated by deep tropical convection, and the smallest in
+the Pampa, whose extratropical climate most closely resembles the
+Illinois context in which the original curves were calibrated.
+
+We attribute this national Q1 prevalence to the rapid release of
+thermodynamic instability by afternoon deep convection, which is the
+dominant precipitation mechanism across most of Brazil and concentrates
+rainfall in the first quarter of storm time. The interpretation is
+supported by the seasonal signal, in which the austral winter (JJA)
+dip in Q1 fraction to 33.6\% coincides with the increased frontal and
+stratiform influence that characterises the subtropical south in that
+season. The choice of a 6-h inter-event time definition is justified
+on three independent grounds — replication of the original Huff (1967)
+protocol, maximisation of the qualifying event count (290,164), and
+the lowest curve-fit error relative to the reference among the tested
+values — lending additional confidence to the derived curves.
+
+Beyond these scientific findings, the study delivers a practical
+resource for Brazilian hydrological engineering. Polynomial
+coefficients and long-form percentile curves are provided at station,
+biome, state, and municipality levels as open supplementary data and
+through the interactive web application described in
+Section~\ref{sec:webatlas}, offering a locally calibrated alternative
+to the transplanted Illinois reference wherever Brazilian sub-daily
+rainfall data are available. A controlled SCS-CN design-hydrograph
+experiment confirms that the systematic upward departure of the
+Brazilian curves from the Huff (1967) reference is not merely
+statistical: across 579 small headwater catchments it raises the design
+peak discharge by a median of 8\%, and by up to 11\% in the convective
+Cerrado, with the imported curves erring in the unconservative
+direction. Because this has direct consequences for the sizing of urban
+drainage and flood-control infrastructure, we recommend that locally
+derived curves replace the Illinois reference in Brazilian practice.
+
+%%====================================================================
+\section*{CRediT authorship contribution statement}
+
+\textbf{Marcus Nobrega Gomes Junior}: Conceptualisation, Methodology,
+Software, Formal analysis, Investigation, Data curation, Writing –
+original draft, Writing – review and editing, Visualisation.
+
+%%====================================================================
+\section*{Declaration of competing interest}
+
+The author declares that he has no known competing financial interests
+or personal relationships that could have appeared to influence the
+work reported in this paper.
+
+%%====================================================================
+\section*{Data availability}
+
+The ANA telemetric rainfall data are publicly available through the
+ANA Hidroweb portal (\url{https://www.snirh.gov.br/hidroweb}).
+All processed outputs — station-level, biome-level, state-level, and
+municipality-level Huff curve coefficients, long-form percentile
+curves, and the Python pipeline — are available on GitHub at
+\url{https://github.com/marcusnobrega-eng/Huff_Curves_BR}.
+The design-hydrograph experiment additionally uses publicly available
+third-party datasets: HydroBASINS level-12 catchments
+\citep{Lehner2013}, the Copernicus GLO-90 digital elevation model
+\citep{CopernicusDEM}, SoilGrids 250~m soil-texture fractions
+\citep{Poggio2021}, and the gridded Sherman-type intensity–duration–frequency surfaces of
+\citet{GomesJuniorIDF}; the per-catchment results and design
+hydrographs are included in the repository.
+
+%%====================================================================
+\section*{Acknowledgements}
+
+The author thanks the Agência Nacional de Águas e Saneamento Básico
+(ANA) for maintaining and openly distributing the telemetric
+hydrometeorological network used in this study.
+
+%%====================================================================
+%% Tables
+%%====================================================================
+
+\begin{table}[!t]
+  \centering
+  \caption{Event characteristics by dominant quartile. Values are
+    median (interquartile range in parentheses) unless noted.
+    All events use IETD = 6~h and minimum storm total = 12.7~mm.}
+  \label{tab:events}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    & Q1 & Q2 & Q3 & Q4 & All \\
+    \midrule
+    $N$ events      &
+      126{,}565 & 70{,}396 & 55{,}132 & 38{,}071 & 290{,}164 \\
+    \% of events    &
+      43.6 & 24.3 & 19.0 & 13.1 & 100.0 \\
+    \midrule
+    Volume (mm)     &
+      26.0 & 27.6 & 27.8 & 27.0 & 26.8 \\
+                    &
+      (18.0–40.8) & (18.8–44.0) & (18.8–45.0) & (18.0–49.6) & (18.2–43.2) \\
+    Duration (h)    &
+      9.0 & 10.5 & 12.0 & 13.0 & 10.0 \\
+                    &
+      (5.5–15.0) & (5.8–18.0) & (7.3–19.0) & (8.0–22.0) & (6.0–17.3) \\
+    Avg intensity (mm~h$^{-1}$) &
+      3.06 & 2.94 & 2.53 & 2.39 & 2.82 \\
+    Max intensity (mm~h$^{-1}$) &
+      20.4 & 16.0 & 15.0 & 16.0 & 17.6 \\
+    \midrule
+    \multicolumn{6}{l}{\textit{Seasonal Q1 fraction (\%)}} \\
+    DJF (summer) & \multicolumn{4}{l}{45.4\% Q1 \quad (112{,}800 events total)} & \\
+    MAM (autumn) & \multicolumn{4}{l}{44.1\% Q1 \quad (71{,}513 events total)} & \\
+    JJA (winter) & \multicolumn{4}{l}{33.6\% Q1 \quad (31{,}480 events total)} & \\
+    SON (spring) & \multicolumn{4}{l}{44.8\% Q1 \quad (74{,}371 events total)} & \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+%%--------------------------------------------------------------------
+\begin{table}[!t]
+  \centering
+  \caption{Biome-level summary of Q1 Huff curve characteristics.
+    $n_\mathrm{sta}$: number of accepted stations.
+    $N_\mathrm{ev}$: total qualifying events (IETD~=~6~h;
+    minimum depth~=~12.7~mm).
+    $\tilde{r}$: median station record length (yr).
+    $f_\mathrm{Q1}$: fraction of stations for which Q1 is
+    the dominant (modal) quartile, i.e.\ the most frequent
+    event-timing class at that station.
+    MAE: mean absolute error of the biome Q1 median curve
+    $\hat{F}(\tau)$ relative to the Huff (1967) Q1 reference
+    $F_\mathrm{ref}(\tau)$, averaged over 20 equally spaced values
+    of normalised storm time $\tau \in (0, 1]$:
+    $\mathrm{MAE} = \tfrac{1}{20}\sum_{j}|\hat{F}(\tau_j)
+    - F_\mathrm{ref}(\tau_j)|$.
+    $D_\mathrm{max}$: maximum absolute deviation
+    $\max_\tau|\hat{F}(\tau) - F_\mathrm{ref}(\tau)|$.
+    95\%~CI~width: bootstrap 95\% confidence interval width of
+    $\hat{F}(\tau)$ at $\tau = 0.5$ (B~=~2{,}000 station resamples),
+    given in parentheses.
+    Pantanal ($n_\mathrm{sta}=5$): interpret with caution.}
+  \label{tab:biome}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lrrrrrrr}
+    \toprule
+    Biome & $n_\mathrm{sta}$ & $N_\mathrm{ev}$ & $\tilde{r}$ (yr) &
+      $f_\mathrm{Q1}$ (\%) & MAE & $D_\mathrm{max}$ &
+      95\% CI width \\
+    \midrule
+    Amazônia        & 132 & 50{,}299 & 10.5 & 99.2 & 0.063 & 0.121 & (0.011) \\
+    Caatinga        &  49 &  6{,}491 &  7.3 & 98.0 & 0.059 & 0.112 & (0.029) \\
+    Cerrado         & 348 & 85{,}521 & 10.4 & 99.7 & 0.060 & 0.114 & (0.007) \\
+    Mata Atlântica  & 488 &141{,}356 & 10.8 & 88.7 & 0.028 & 0.042 & (0.007) \\
+    Pampa           &  23 &  4{,}913 &  7.4 & 95.7 & 0.019 & 0.062 & (0.019) \\
+    Pantanal        &   5 &  1{,}584 & 16.0 & 100.0 & 0.058 & 0.115 & (0.059) \\
+    \midrule
+    \textbf{National} & \textbf{1{,}045} & \textbf{290{,}164} &
+      \textbf{10.6} & \textbf{94.4} & \textbf{0.045} &
+      \textbf{0.097} & \textbf{(0.006)} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+%%--------------------------------------------------------------------
+\begin{table}[!t]
+  \centering
+  \caption{IETD sensitivity analysis. Baseline (IETD = 6~h) in bold.
+    ``Agreement'' = fraction of the 1{,}045 baseline-OK stations
+    retaining the same dominant quartile as the 6-h baseline.
+    MAE and $D_\mathrm{max}$ computed for the national Q1 median
+    empirical curve relative to the Huff (1967) reference.}
+  \label{tab:ietd}
+  \begin{tabular}{rrrrrr}
+    \toprule
+    IETD (h) & $N$ events & Med dur (h) & Q1 sta (\%) &
+      Agreement & Q1 MAE \\
+    \midrule
+    2  & 269{,}768 &  6.5 & 84.8 & 88.1\% & 0.032 \\
+    4  & 285{,}737 &  8.3 & 92.4 & 96.3\% & 0.040 \\
+    \textbf{6} & \textbf{290{,}164} & \textbf{10.0} & \textbf{94.4} &
+      \textbf{—} & \textbf{0.045} \\
+    8  & 289{,}615 & 12.3 & 96.5 & 97.1\% & 0.050 \\
+    12 & 279{,}484 & 18.0 & 98.5 & 95.7\% & 0.057 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+%%--------------------------------------------------------------------
+\begin{table}[!t]
+  \centering
+  \caption{Comparison of reported Huff quartile results across the
+    principal published derivations. Values are the fraction of
+    \emph{events} in each quartile (Q1–Q4) where available; ``Q1+Q2''
+    denotes a combined figure reported jointly. The station-level Q1
+    dominance of the present study (94.4\% of stations) is a different
+    metric and is not directly comparable to the event-level fractions
+    in this table (see Section~\ref{sec:mechanism}). n/r = not reported
+    as a separable value.}
+  \label{tab:comparison}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lllrrrrl}
+    \toprule
+    Study & Region & Climate & Q1 & Q2 & Q3 & Q4 & Notes \\
+    \midrule
+    \citet{Huff1967}        & Illinois, USA      & Temperate cont.\ &
+      30 & 36 & 19 & 15 & Q2 most frequent \\
+    \citet{AzliRao2010}     & Pen.\ Malaysia     & Tropical maritime &
+      \multicolumn{4}{c}{Q2 dominant (n/r)} & $\sim$5{,}800 storms \\
+    \citet{Liang2017}       & Guangzhou, China   & Subtropical &
+      \multicolumn{2}{c}{Q1+Q2 = 84} & \multicolumn{2}{c}{n/r} &
+      peak at 33\% of duration \\
+    \citet{SantaCatarina2021} & Santa Catarina, BR & Subtropical high &
+      46.7 & $\sim$28 & $\sim$12 & $\sim$13 & Lages station \\
+    \citet{SantaCatarina2021} & Santa Catarina, BR & Subtropical high &
+      44.7 & $\sim$28 & $\sim$12 & $\sim$13 & São Joaquim station \\
+    \citet{Florianopolis2021} & Florianópolis, BR & Coastal subtrop.\ &
+      \multicolumn{4}{c}{Q1 (Type I) predominant} & single city \\
+    \textbf{This study}     & \textbf{Brazil (national)} &
+      \textbf{Mixed trop./subtrop.} &
+      \textbf{43.6} & \textbf{24.3} & \textbf{19.0} & \textbf{13.1} &
+      290{,}164 events \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+%%====================================================================
+%% Figures
+%%====================================================================
+
+%% Figure 1 — Study area and data availability (first figure in paper)
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/casestudy_dem}
+  \caption{(a) Spatial distribution and record length of the 3{,}164 ANA
+    telemetric stations across Brazil. Biome zones are shown with distinct
+    colour fills (legend); state boundaries in dark grey. Station circles
+    are coloured by years of available record (inset colour scale);
+    light grey circles ($n=2{,}119$) indicate stations excluded from the
+    analysis due to insufficient record length or excessive missing data.
+    (b) Distribution of station record lengths for all catalogued stations
+    (grey) and the 1{,}045 quality-control-accepted stations (colour-filled).
+    Dashed red line: 4-year minimum quality-control threshold.
+    Median record length for accepted stations: 10.6~years.}
+  \label{fig:casestudy}
+\end{figure}
+
+%% Diurnal cycle of event initiation
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/diurnal_cycle}
+  \caption{Diurnal cycle of rainfall-event initiation
+    (290{,}164 events). (a) Hour-of-day distribution of event start
+    times for all events (grey) and for each dominant quartile
+    (Q1–Q4, coloured); the shaded band marks the afternoon window
+    (12–18~h). (b) Timing gradient across quartiles: bars give the
+    modal start hour (left axis), and the line gives the fraction of
+    events beginning in the morning, 06–12~h (right axis). Hours follow
+    the ANA telemetric recording convention; the monotonic ordering of
+    the quartiles is invariant to any uniform time-zone offset. First-
+    quartile (front-loaded) storms peak latest in the day and are least
+    likely to begin in the morning, consistent with afternoon
+    convective forcing.}
+  \label{fig:diurnal}
+\end{figure}
+
+%% Figure 2 — National Huff curves
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/huff_curves_national_bootstrap}
+  \caption{National empirical Huff curves for Brazil derived from
+    1{,}045 rain-gauge stations (290{,}164 events, 2010–2025).
+    Panels (a)–(d): quartiles Q1–Q4. Solid coloured line: national
+    median empirical curve. Light shaded band: P10–P90 inter-station
+    range. Darker shaded band: bootstrap 95\% confidence interval on
+    the national median ($B=2{,}000$ resamples). Dashed black line:
+    Huff (1967) reference curve for that quartile (Illinois, USA).
+    Dotted diagonal: uniform temporal distribution ($F = \tau$).}
+  \label{fig:national}
+\end{figure}
+
+%% Figure 3 — Biome Q1 curves
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/huff_curves_biome_Q1_bootstrap}
+  \caption{Q1 empirical Huff curves by IBGE biome. Layout as in
+    Fig.~\ref{fig:national}. Station count ($n$) and MAE relative
+    to the Huff (1967) Q1 reference are annotated in each panel.
+    The Pantanal (f) result is based on $n=5$ stations and should
+    be interpreted cautiously.}
+  \label{fig:biome}
+\end{figure}
+
+%% Figure 4 — Dominant quartile map
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/map_dominant_quartile}
+  \caption{Spatial distribution of the dominant Huff quartile at
+    each of the 1{,}045 accepted Brazilian rain-gauge stations.
+    Grey circles ($n=2{,}119$) indicate stations excluded by
+    quality control. Light and dark grey lines: IBGE biome and
+    state boundaries, respectively.}
+  \label{fig:map_q}
+\end{figure}
+
+%% Quartile composition maps
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/map_quartile_percent}
+  \caption{Per-station quartile composition of the event population.
+    Maps (a)–(d) show, for each accepted station, the share of its
+    events falling in the first, second, third, and fourth quartile,
+    respectively, over biome (light grey) and national (dark grey)
+    boundaries. A single colour scale is shared across the four panels
+    (arrowed ends mark values beyond the 2nd–98th percentile of the
+    pooled data, which are clipped), so the panels directly convey the
+    magnitude ordering Q1~$>$~Q2~$>$~Q3~$>$~Q4. The bottom-left inset
+    of each map gives the per-biome median share for that quartile,
+    coloured and ordered as in the legend, with the panel maximum
+    labelled.}
+  \label{fig:quartile_percent}
+\end{figure}
+
+%% Figure 5 — MAE / D_max maps
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/map_mae_dmax_quartiles}
+  \caption{Per-quartile spatial distribution of goodness-of-fit metrics
+    for the empirical Huff curves relative to the Huff (1967) Illinois
+    reference. Top row (a–d): mean absolute error (MAE) for quartiles
+    Q1–Q4; bottom row (e–h): maximum absolute deviation
+    ($D_\mathrm{max}$, the Kolmogorov–Smirnov statistic) for Q1–Q4.
+    Each station is coloured by its own per-quartile metric, over biome
+    (light grey) and national (dark grey) boundaries. Within each row
+    the colour scale is shared across all four quartiles and the
+    arrowed (extended) ends indicate values beyond the 2nd–98th
+    percentile of the pooled data, which are clipped; brighter (yellow)
+    tones denote larger departures from the reference. The inset bar
+    chart in the lower-left of each map gives the median metric for
+    each of the six IBGE biomes, ordered and coloured as in the legend
+    (Amazônia, Caatinga, Cerrado, Mata Atlântica, Pampa, Pantanal);
+    the inset uses a common vertical scale within each row, whose
+    maximum is labelled.}
+  \label{fig:map_mae}
+\end{figure}
+
+%%====================================================================
+%% Supplementary figure
+%%====================================================================
+
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/ietd_sensitivity}
+  \caption{IETD sensitivity analysis across $\{2, 4, 6, 8, 12\}$~h.
+    (a) Total qualifying event count (solid, left axis) and median
+    event duration (dashed, right axis). (b) Event-level quartile
+    fraction (\%). (c) Fraction of stations with Q1 as dominant
+    quartile, shown nationally (thick black line) and by biome.
+    (d) MAE (solid) and $D_\mathrm{max}$ (dashed) of empirical Q1–Q4
+    national median curves relative to the Huff (1967) reference.
+    Vertical dashed grey line marks the baseline IETD = 6~h used
+    in the main analysis.}
+  \label{fig:ietd}
+\end{figure}
+
+%% Hydrological impact figure
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.85\columnwidth]{figures/hydro_impact}
+  \caption{Hydrological impact of replacing the original Huff (1967) Q1
+    curve with the locally derived biome Q1 curve, from a controlled
+    design-hydrograph experiment on 579 small, SCS-eligible HydroBASINS
+    level-12 catchments.
+    \textit{Row 1 — response variables:}
+    (a)~Change in design peak discharge $\Delta Q_p$ (\%);
+    (b)~time-to-peak shift $\Delta t_p$ (h; negative = earlier peak);
+    (c)~change in total hydrograph duration $\Delta T_d$ (h), defined
+    as the time for discharge to return to 1\% of its peak value.
+    \textit{Row 2 — rainfall and routing descriptors:}
+    (d)~SCS curve number CN (antecedent moisture condition II);
+    (e)~time of concentration $T_c$ (h) estimated from the
+    \citet{Kirpich1940} formula;
+    (f)~25-year design rainfall intensity (mm~h$^{-1}$) from the
+    gridded Sherman IDF surfaces of \citet{GomesJuniorIDF}.
+    \textit{Row 3 — catchment physical properties:}
+    (g)~runoff coefficient $RC = Q_\mathrm{runoff}/P$, identical for
+    both Huff patterns by the SCS-CN model (see Section~\ref{sec:limitations});
+    (h)~catchment drainage area (km$^2$);
+    (i)~soil clay fraction (\%) from SoilGrids 250~m
+    \citep{Poggio2021}.
+    In each panel, catchments are plotted as coloured dots; the
+    biome-level distribution is summarised by the boxplot inset
+    (Ce~=~Cerrado, Ca~=~Caatinga, MA~=~Mata~Atlântica, Pa~=~Pampa;
+    boxes span the interquartile range; whiskers the 5th–95th
+    percentiles).
+    Catchment geometry, CN, $T_c$, design depth, and storm duration are
+    held identical between the two hydrograph runs, isolating the effect
+    of the temporal rainfall pattern.}
+  \label{fig:hydro}
+\end{figure}
+
+%% Website atlas (last figure)
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/website_viewer.pdf}
+  \caption{The \emph{Huff Curves BR Atlas} interactive web application.
+    (a) Full interface: the left column provides dataset summary
+    statistics, station search, and filters (status, dominant quartile,
+    state, biome, minimum event count, minimum record length); the
+    central panel is an interactive map of Brazil with stations
+    colour-coded by dominant Huff quartile and sized by valid event
+    count; the right column shows the detailed record for the selected
+    station (here, station 14100000, Manacapuru, Amazonas), including
+    geographic and administrative metadata, data-quality diagnostics,
+    the dominant quartile, and the mean absolute error (MAE) of the
+    station curves relative to the Huff (1967) reference. Panels
+    (b)–(e) show the per-station analytical outputs accessible for the
+    selected station: (b) the empirical normalised Huff curves for all
+    four quartiles, with the P10 and P90 envelope for the dominant
+    quartile; (c) the design-storm hyetograph reconstructed for a
+    user-specified duration, volume, and time step, with the cumulative
+    mass curve overlaid; (d) the event-quartile composition and
+    per-quartile statistics; and (e) the fitted 7th-degree polynomial
+    coefficients for each quartile. The tool runs entirely in the
+    browser and requires no installation. Provisional URL:
+    \url{https://huff-curves-br.github.io/atlas/}.}
+  \label{fig:webatlas}
+\end{figure}
+
+%%====================================================================
+%% References
+%%====================================================================
+\bibliographystyle{elsarticle-harv}
+\bibliography{references}
+
+\end{document}

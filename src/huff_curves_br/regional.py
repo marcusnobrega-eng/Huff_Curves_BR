@@ -21,7 +21,7 @@ def _as_station_id(series: pd.Series) -> pd.Series:
 def _fit_curve(tau: np.ndarray, curve: np.ndarray, quartile: int) -> Tuple[np.ndarray, MetricResult]:
     finite = np.isfinite(tau) & np.isfinite(curve)
     if finite.sum() < HUFF_FIT_DEGREE + 1:
-        return np.full(HUFF_FIT_DEGREE + 1, np.nan), MetricResult(*(float("nan"),) * 7, n_valid=0)
+        return np.full(HUFF_FIT_DEGREE + 1, np.nan), MetricResult(*(float("nan"),) * 8, n_valid=0)
     coeffs = np.polyfit(tau[finite], curve[finite], HUFF_FIT_DEGREE)
     fitted_reference_tau = sanitize_cdf(np.polyval(coeffs, HUFF_REFERENCE_TAU), force_endpoints=False)
     reference = original_huff_curves(HUFF_REFERENCE_TAU)[quartile - 1]
@@ -29,10 +29,11 @@ def _fit_curve(tau: np.ndarray, curve: np.ndarray, quartile: int) -> Tuple[np.nd
 
 
 def _metric_prefix(row: Dict[str, object], prefix: str, coeffs: np.ndarray, metrics: MetricResult) -> None:
+    row[f"{prefix}_mae"] = metrics.mae
+    row[f"{prefix}_d_max"] = metrics.d_max
     row[f"{prefix}_kge"] = metrics.kge
     row[f"{prefix}_r2"] = metrics.r2
     row[f"{prefix}_rmse"] = metrics.rmse
-    row[f"{prefix}_mae"] = metrics.mae
     for i, coef in enumerate(coeffs, start=1):
         row[f"{prefix}_coef_{i}"] = float(coef)
 
@@ -73,7 +74,9 @@ def _station_summary(
         row["n_stations"] = int(group["station_id"].nunique())
         row["n_events"] = int(pd.to_numeric(group["n_events"], errors="coerce").fillna(0).sum())
         row["median_years_span"] = float(pd.to_numeric(group["years_span"], errors="coerce").median())
-        row["median_kge_mean"] = float(pd.to_numeric(group["kge_mean"], errors="coerce").median())
+        row["median_mae_mean"] = float(pd.to_numeric(group.get("mae_mean", pd.Series(dtype=float)), errors="coerce").median())
+        row["median_d_max_mean"] = float(pd.to_numeric(group.get("d_max_mean", pd.Series(dtype=float)), errors="coerce").median())
+        row["median_kge_mean"] = float(pd.to_numeric(group.get("kge_mean", pd.Series(dtype=float)), errors="coerce").median())
         row["median_missing_fraction"] = float(pd.to_numeric(group["missing_fraction"], errors="coerce").median())
         row["median_max_intensity_mm_h"] = float(pd.to_numeric(group["station_max_intensity_mm_h"], errors="coerce").median())
         row["max_event_intensity_mm_h"] = float(pd.to_numeric(group["station_max_intensity_mm_h"], errors="coerce").max())

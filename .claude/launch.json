@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "huff-web",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8767", "--directory", "web/huff_viewer"],
+      "port": 8767
+    },
+    {
+      "name": "huff-docs",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8768", "--directory", "docs"],
+      "port": 8768
+    }
+  ]
+}

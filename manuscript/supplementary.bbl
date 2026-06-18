@@ -1,0 +1,71 @@
+\begin{thebibliography}{7}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\href}[2]{#2}
+\providecommand{\path}[1]{#1}
+\providecommand{\DOIprefix}{doi:}
+\providecommand{\ArXivprefix}{arXiv:}
+\providecommand{\URLprefix}{URL: }
+\providecommand{\Pubmedprefix}{pmid:}
+\providecommand{\doi}[1]{\href{http://dx.doi.org/#1}{\path{#1}}}
+\providecommand{\Pubmed}[1]{\href{pmid:#1}{\path{#1}}}
+\providecommand{\bibinfo}[2]{#2}
+\ifx\xfnm\relax \def\xfnm[#1]{\unskip,\space#1}\fi
+%Type = Misc
+\bibitem[{{European Space Agency and Airbus}(2022)}]{CopernicusDEM}
+\bibinfo{author}{{European Space Agency and Airbus}}, \bibinfo{year}{2022}.
+\newblock \bibinfo{title}{Copernicus {DEM} -- global and european digital
+  elevation model ({GLO-90})}.
+\newblock \bibinfo{howpublished}{Copernicus Data Space Ecosystem}.
+\newblock \DOIprefix\doi{10.5270/ESA-c5d3d65}.
+%Type = Article
+\bibitem[{Gomes~Junior(2025)}]{GomesJuniorIDF}
+\bibinfo{author}{Gomes~Junior, M.N.}, \bibinfo{year}{2025}.
+\newblock \bibinfo{title}{A nationally consistent assessment of
+  intensity--duration--frequency curves for {Brazil} using long-term gridded
+  and satellite rainfall data}.
+\newblock \bibinfo{journal}{Physics and Chemistry of the Earth}
+  \bibinfo{note}{Under review}.
+%Type = Article
+\bibitem[{Kirpich(1940)}]{Kirpich1940}
+\bibinfo{author}{Kirpich, Z.P.}, \bibinfo{year}{1940}.
+\newblock \bibinfo{title}{Time of concentration of small agricultural
+  watersheds}.
+\newblock \bibinfo{journal}{Civil Engineering} \bibinfo{volume}{10},
+  \bibinfo{pages}{362}.
+%Type = Article
+\bibitem[{Lehner and Grill(2013)}]{Lehner2013}
+\bibinfo{author}{Lehner, B.}, \bibinfo{author}{Grill, G.},
+  \bibinfo{year}{2013}.
+\newblock \bibinfo{title}{Global river hydrography and network routing:
+  baseline data and new approaches to study the world's large river systems}.
+\newblock \bibinfo{journal}{Hydrological Processes} \bibinfo{volume}{27},
+  \bibinfo{pages}{2171--2186}.
+\newblock \DOIprefix\doi{10.1002/hyp.9740}.
+%Type = Article
+\bibitem[{Poggio et~al.(2021)Poggio, de~Sousa, Batjes, Heuvelink, Kempen,
+  Ribeiro and Rossiter}]{Poggio2021}
+\bibinfo{author}{Poggio, L.}, \bibinfo{author}{de~Sousa, L.M.},
+  \bibinfo{author}{Batjes, N.H.}, \bibinfo{author}{Heuvelink, G.B.M.},
+  \bibinfo{author}{Kempen, B.}, \bibinfo{author}{Ribeiro, E.},
+  \bibinfo{author}{Rossiter, D.}, \bibinfo{year}{2021}.
+\newblock \bibinfo{title}{{SoilGrids} 2.0: producing soil information for the
+  globe with quantified spatial uncertainty}.
+\newblock \bibinfo{journal}{SOIL} \bibinfo{volume}{7},
+  \bibinfo{pages}{217--240}.
+\newblock \DOIprefix\doi{10.5194/soil-7-217-2021}.
+%Type = Techreport
+\bibitem[{{USDA-NRCS}(2004)}]{NRCS2004}
+\bibinfo{author}{{USDA-NRCS}}, \bibinfo{year}{2004}.
+\newblock \bibinfo{title}{National Engineering Handbook, Part 630: Hydrology}.
+\newblock \bibinfo{type}{Technical Report}. U.S. Department of Agriculture,
+  Natural Resources Conservation Service. \bibinfo{address}{Washington, DC}.
+%Type = Techreport
+\bibitem[{{USDA-SCS}(1986)}]{TR55_1986}
+\bibinfo{author}{{USDA-SCS}}, \bibinfo{year}{1986}.
+\newblock \bibinfo{title}{Urban Hydrology for Small Watersheds, Technical
+  Release 55 ({TR-55})}.
+\newblock \bibinfo{type}{Technical Report}. U.S. Department of Agriculture,
+  Soil Conservation Service. \bibinfo{address}{Washington, DC}.
+
+\end{thebibliography}

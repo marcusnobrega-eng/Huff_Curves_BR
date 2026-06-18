@@ -1,0 +1,443 @@
+%% Supplementary Material
+%% Empirical Huff Curves for Brazil — Journal of Hydrology
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=2.4cm,top=2.8cm,bottom=2.8cm]{geometry}
+\usepackage[authoryear]{natbib}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\definecolor{linkblue}{HTML}{1F6FB5}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage[
+  colorlinks = true,
+  linkcolor  = linkblue,
+  citecolor  = linkblue,
+  urlcolor   = linkblue,
+]{hyperref}
+\onehalfspacing
+
+% S-prefixed figures, tables, equations
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\theequation}{S\arabic{equation}}
+\renewcommand{\thesection}{S\arabic{section}}
+
+% Running header
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\textit{Supplementary Material}}
+\fancyhead[R]{\small\textit{Huff Curves for Brazil}}
+\fancyfoot[C]{\small\thepage}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \fancyfoot[C]{\small\thepage}
+}
+
+\title{\textbf{Supplementary Material}\\[6pt]
+{\large Empirical Huff Curves for Brazil: A National-Scale Derivation
+from ANA Sub-Daily Rainfall Records}}
+
+\author{Marcus Nobrega Gomes Junior}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{center}\small
+  \textit{$^1$Department of Earth System Science, Stanford University,
+  Braun Hall, Bldg.\ 320, 450 Jane Stanford Way,
+  Stanford, California 94305, USA}\\[3pt]
+  \textit{$^2$Department of Hydrology and Atmospheric Sciences,
+  University of Arizona,
+  John W.\ Harshbarger Building, Tucson, Arizona 85719, USA}\\[5pt]
+  ORCID: 0000-0002-8250-8195\quad
+  \texttt{mngomes@stanford.edu}
+\end{center}
+\vspace{0.5em}
+\noindent\rule{\linewidth}{0.4pt}
+\vspace{0.5em}
+
+This document provides general supporting information for the paper.
+Section~\ref{sec:supp_pipeline} summarises the station processing
+pipeline and quality-control outcome for the full 3{,}164-station
+ANA network.
+Sections~\ref{sec:supp_purpose}--\ref{sec:supp_results} document the
+design-hydrograph sensitivity experiment in full detail, covering
+the experimental design (Section~\ref{sec:supp_purpose}), input
+datasets (Section~\ref{sec:supp_data}), catchment selection
+(Section~\ref{sec:supp_catch}), and the complete mathematical
+description of the rainfall--runoff method
+(Section~\ref{sec:supp_math}), so that the experiment can be
+reproduced independently.
+Section~\ref{sec:supp_quartile} provides the per-station quartile
+distribution for all accepted stations.
+
+\vspace{1em}
+\noindent\rule{\linewidth}{0.4pt}
+{\setlength{\parskip}{0pt}
+\listoftables
+\listoffigures}
+\noindent\rule{\linewidth}{0.4pt}
+\vspace{0.5em}
+
+%%====================================================================
+\section{Processing pipeline and quality-control summary}
+\label{sec:supp_pipeline}
+
+Table~\ref{tab:supp_processing} summarises the outcome of the
+station-level quality-control pipeline applied to the 3{,}164 ANA
+telemetric stations. A station was accepted if it met all four
+criteria simultaneously: (i) record span $\geq$~4~yr; (ii) missing
+fraction $\leq$~20\%; (iii) no calendar year with a full-zero daily
+record (instrument failure indicator); and (iv) no interval depth
+implying an intensity exceeding 300~mm~h$^{-1}$.
+
+\begin{table}[h]
+  \centering
+  \caption{Processing pipeline outcome for the 3{,}164 ANA telemetric
+    stations. Quality filters applied simultaneously: record span
+    $\geq$~4~yr; missing fraction $\leq$~20\%; no full-zero calendar
+    year; maximum interval intensity $\leq$~300~mm~h$^{-1}$.}
+  \label{tab:supp_processing}
+  \small
+  \begin{tabular}{lrrp{6.5cm}}
+    \toprule
+    Outcome & $N$ & \% & Notes \\
+    \midrule
+    Accepted — curves fitted & 1{,}045 & 33.0 &
+      Passed all filters; empirical Huff curves derived \\
+    Rejected — quality       & 2{,}086 & 65.9 &
+      Failed $\geq$1 filter (93.1\% excessive missing data;
+      1.9\% full-zero calendar year; 1.5\% insufficient
+      record length) \\
+    Rejected — no data       &    33   &  1.0 &
+      No locally cached ANA data available \\
+    \midrule
+    \textbf{Total}           & \textbf{3{,}164} & \textbf{100.0} & \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+%%====================================================================
+\section{Purpose and design of the experiment}
+\label{sec:supp_purpose}
+
+The experiment is a \emph{controlled} comparison: for each catchment a
+single design hydrograph is computed twice, once with the original
+Huff (1967) first-quartile (Q1) reference curve and once with the
+locally derived biome Q1 curve from this study. The catchment geometry,
+curve number, time of concentration, design rainfall depth, and storm
+duration are held identical between the two runs. The only quantity
+that differs is the dimensionless temporal pattern (the cumulative mass
+curve), so the resulting change in peak discharge $\Delta Q_p$ and in
+time-to-peak $\Delta t_p$ is attributable solely to the hyetograph
+shape. Because the loss model and unit hydrograph are common to both
+runs, systematic errors in the absolute curve number, time of
+concentration, and unit-hydrograph shape largely cancel in the relative
+comparison.
+
+%%====================================================================
+\section{Input datasets}
+\label{sec:supp_data}
+
+Table~\ref{tab:supp_data} lists the datasets used. Their spatial fields
+are shown in Fig.~\ref{fig:supp_inputs}: the curve number, time of
+concentration, and 25-year design depth at the sampled catchments
+(panels a--c), the soil clay fraction (panels d--e), and the gridded
+1-hour, 25-year design intensity derived from the gridded Sherman IDF
+surfaces of \citet{GomesJuniorIDF} (panel f).
+
+\begin{table}[h]
+  \centering
+  \caption{Input datasets for the design-hydrograph experiment.}
+  \label{tab:supp_data}
+  \small
+  \begin{tabular}{p{2.6cm}p{3.2cm}p{2.0cm}p{4.4cm}}
+    \toprule
+    Quantity & Source & Resolution & Use \\
+    \midrule
+    Catchments & HydroBASINS level 12 \citep{Lehner2013} & vector &
+      Catchment polygons, drainage area \\
+    Terrain & Copernicus GLO-90 DEM \citep{CopernicusDEM} & 90~m &
+      Relief and channel slope $\rightarrow$ time of concentration \\
+    Soil texture & SoilGrids 2.0 \citep{Poggio2021} & 250~m &
+      Clay/sand fractions $\rightarrow$ hydrologic soil group $\rightarrow$ CN \\
+    Design rainfall & Gridded Sherman IDF \citep{GomesJuniorIDF} &
+      0.1$^{\circ}$ & Design depth at duration $=T_c$, $T=25$~yr \\
+    Temporal pattern & This study (biome Q1) and Huff (1967) Q1 &
+      --- & Dimensionless cumulative mass curves \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figures/supp_inputs}
+  \caption{Input-data fields for the 579 catchments. (a) Curve number
+    (antecedent moisture condition II); (b) time of concentration;
+    (c) 25-year design rainfall depth for a storm of duration equal to
+    the time of concentration; (d) soil clay fraction at the catchments;
+    (e) gridded SoilGrids 250~m clay fraction; (f) gridded 1-hour,
+    25-year design rainfall intensity computed from the Sherman IDF
+    parameters. Biome (light grey) and national (dark grey) boundaries
+    are shown.}
+  \label{fig:supp_inputs}
+\end{figure}
+
+%%====================================================================
+\section{Catchment selection}
+\label{sec:supp_catch}
+
+The SCS-CN method and the SCS dimensionless unit hydrograph were
+developed for small, infiltration-excess (Hortonian) agricultural
+watersheds and are not valid where saturation-excess (variable
+source area) runoff dominates or where rainfall cannot be treated as
+spatially uniform \citep{NRCS2004,TR55_1986}. Catchments were therefore
+screened from the HydroBASINS level-12 layer using the criteria in
+Table~\ref{tab:supp_criteria}. Of 30{,}866 eligible catchments, a
+stratified random sample of 150 per biome (600 total) was drawn;
+579 yielded complete input data and a valid hydrograph
+(Fig.~\ref{fig:supp_catchments}).
+
+\begin{table}[h]
+  \centering
+  \caption{Catchment eligibility criteria.}
+  \label{tab:supp_criteria}
+  \small
+  \begin{tabular}{p{4.2cm}p{8.0cm}}
+    \toprule
+    Criterion & Rationale \\
+    \midrule
+    Drainage area 5--250~km$^2$ &
+      Small enough for a lumped unit hydrograph and spatially uniform
+      design rainfall \\
+    Biome $\in$ \{Cerrado, Caatinga, Mata Atl\^antica, Pampa\} &
+      Infiltration-excess regimes; Amaz\^onia and Pantanal excluded as
+      saturation-excess / wetland \\
+    Valid terrain, soil, and IDF data &
+      Finite relief, soil texture, and Sherman parameters at the
+      catchment \\
+    Time of concentration $0.1$--$24$~h &
+      Within the validity window of the IDF and unit-hydrograph methods \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.66\textwidth]{figures/supp_catchments}
+  \caption{Eligible HydroBASINS level-12 catchments (coloured by biome)
+    and the 579 sampled catchments used in the experiment (black points).}
+  \label{fig:supp_catchments}
+\end{figure}
+
+The curve number (antecedent moisture condition II) was assigned from
+the catchment hydrologic soil group (HSG) and the biome-characteristic
+land cover, using the values in Table~\ref{tab:supp_cn}. The HSG was
+derived from the SoilGrids clay and sand fractions $f_{\mathrm{clay}}$
+and $f_{\mathrm{sand}}$ (\%): group A if $f_{\mathrm{sand}}\!\ge\!70$
+and $f_{\mathrm{clay}}\!<\!10$; D if $f_{\mathrm{clay}}\!\ge\!40$;
+C if $f_{\mathrm{clay}}\!\ge\!27$; B if $f_{\mathrm{clay}}\!<\!18$ and
+$f_{\mathrm{sand}}\!\ge\!50$; otherwise C if $f_{\mathrm{clay}}\!\ge\!20$
+and B if not.
+
+\begin{table}[h]
+  \centering
+  \caption{Curve number (AMC II) by biome land cover and hydrologic
+    soil group \citep{NRCS2004}.}
+  \label{tab:supp_cn}
+  \small
+  \begin{tabular}{lcccc}
+    \toprule
+    Biome (land-cover archetype) & A & B & C & D \\
+    \midrule
+    Cerrado (savanna/woodland, good)      & 35 & 58 & 70 & 77 \\
+    Caatinga (semi-arid shrub, fair)      & 45 & 66 & 77 & 83 \\
+    Mata Atl\^antica (forest/ag mosaic)   & 36 & 60 & 73 & 79 \\
+    Pampa (grassland/pasture, good)       & 39 & 61 & 74 & 80 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+%%====================================================================
+\section{Mathematical description of the method}
+\label{sec:supp_math}
+
+\subsection{Design rainfall depth (Sherman IDF)}
+
+The design rainfall intensity $i$ (\si{mm/h}) is obtained from the
+gridded Sherman intensity--duration--frequency relationship of
+\citet{GomesJuniorIDF},
+\begin{equation}
+  i = \frac{K\,T^{a}}{(t + b)^{c}},
+  \label{eq:sherman}
+\end{equation}
+where $T$ is the return period (yr; here $T=25$), $t$ is the storm
+duration (min), and $K$, $a$, $b$, $c$ are the gridded Sherman
+parameters sampled at the catchment centroid. The storm duration is set
+equal to the time of concentration, $t = 60\,T_c$ (with $T_c$ in
+hours), and the total design depth is
+\begin{equation}
+  P = i\,(t = 60\,T_c)\;\times\;T_c .
+  \label{eq:depth}
+\end{equation}
+
+\subsection{Time of concentration}
+
+The main-channel length is estimated from drainage area $A$
+(\si{km^2}) by Hack's law,
+\begin{equation}
+  L = 1.4\,A^{0.6}\quad[\si{km}],
+  \label{eq:hack}
+\end{equation}
+and the channel slope is taken as the catchment relief (5th-to-95th
+percentile elevation range $\Delta z$, from the Copernicus DEM) over the
+channel length, $S = \Delta z / L$. The time of concentration follows
+\citet{Kirpich1940},
+\begin{equation}
+  T_c = \frac{1}{60}\,\bigl[\,0.0078\,L_{\mathrm{ft}}^{0.77}\,S^{-0.385}\,\bigr]
+  \quad[\si{h}],
+  \label{eq:kirpich}
+\end{equation}
+with $L_{\mathrm{ft}} = L/0.3048$ the channel length in feet, and
+$T_c$ clipped to the range $0.1$--$24$~h.
+
+\subsection{Design hyetograph from the Huff curve}
+
+The storm is discretised into $n$ steps of length $\Delta t$. With
+$\tau_k = t_k/(60\,T_c)$ the normalised time and $F(\tau)$ the
+dimensionless cumulative Huff mass curve (the 7th-degree polynomial,
+clipped to $[0,1]$, monotonised, with endpoints fixed to $\{0,1\}$),
+the incremental rainfall depth in step $k$ is
+\begin{equation}
+  \Delta P_k = \bigl[\,F(\tau_k) - F(\tau_{k-1})\,\bigr]\,P .
+  \label{eq:hyeto}
+\end{equation}
+This is evaluated separately for the original Huff (1967) Q1 curve and
+for the biome Q1 curve of this study.
+
+\subsection{SCS-CN direct runoff}
+
+The maximum potential retention $S$ (\si{mm}) is obtained from the
+curve number,
+\begin{equation}
+  S = \frac{25400}{\mathrm{CN}} - 254 ,
+  \label{eq:retention}
+\end{equation}
+and the initial abstraction is $I_a = \lambda S$ with $\lambda = 0.2$.
+The cumulative direct runoff at cumulative rainfall $P_{\mathrm{cum}}$
+is
+\begin{equation}
+  Q_{\mathrm{cum}} =
+  \begin{cases}
+    \dfrac{(P_{\mathrm{cum}} - I_a)^2}{P_{\mathrm{cum}} - I_a + S},
+      & P_{\mathrm{cum}} > I_a,\\[8pt]
+    0, & \text{otherwise,}
+  \end{cases}
+  \label{eq:scscn}
+\end{equation}
+and the incremental excess (effective) rainfall in step $k$ is the first
+difference $\Delta Q_k = Q_{\mathrm{cum},k} - Q_{\mathrm{cum},k-1}$.
+
+\subsection{SCS dimensionless unit hydrograph}
+
+The basin lag is $L_g = 0.6\,T_c$ and, for a unit-rainfall duration
+equal to the computational step $D=\Delta t$, the time to peak of the
+unit hydrograph is
+\begin{equation}
+  T_p = \frac{D}{2} + L_g .
+  \label{eq:tp}
+\end{equation}
+The unit-hydrograph peak discharge (per mm of excess rainfall) uses the
+SI form of the standard peak-rate factor (PRF~484),
+\begin{equation}
+  q_p = \frac{0.208\,A}{T_p}\quad[\si{m^3.s^{-1}.mm^{-1}}],
+  \label{eq:qp}
+\end{equation}
+and the unit-hydrograph ordinates are $u(t) = q_p\,g(t/T_p)$, where
+$g(\cdot)$ is the tabulated SCS dimensionless unit hydrograph
+(PRF~484). The outlet hydrograph is the convolution of the incremental
+excess hyetograph with the unit hydrograph,
+\begin{equation}
+  Q(t_j) = \sum_{k} \Delta Q_k \, u(t_j - t_k).
+  \label{eq:convol}
+\end{equation}
+
+\subsection{Comparison metrics}
+
+For each catchment, Eqs.~\eqref{eq:sherman}--\eqref{eq:convol} are
+evaluated with the original Huff (1967) Q1 curve (reference, subscript
+$r$) and with the biome Q1 curve (local, subscript $l$). The reported
+metrics are the relative change in peak discharge and the shift in
+time-to-peak,
+\begin{equation}
+  \Delta Q_p = 100\,\frac{Q_{p,l} - Q_{p,r}}{Q_{p,r}}\;[\%],
+  \qquad
+  \Delta t_p = t_{p,l} - t_{p,r}\;[\si{h}].
+  \label{eq:metrics}
+\end{equation}
+Positive $\Delta Q_p$ indicates that the locally derived curve produces
+a higher design peak than the imported reference; negative $\Delta t_p$
+indicates an earlier peak.
+
+%%====================================================================
+\section{Per-catchment results}
+\label{sec:supp_results}
+
+The complete per-catchment table — HydroBASINS identifier, biome,
+coordinates, drainage area, relief, slope, time of concentration, soil
+texture, hydrologic soil group, curve number, design depth, reference
+and local peak discharges, $\Delta Q_p$, and $\Delta t_p$ — and the
+design hydrographs are provided in the data archive
+(\texttt{outputs/hydro\_impact/}).
+
+%%====================================================================
+\section{Per-station quartile distribution}
+\label{sec:supp_quartile}
+
+The complete event-quartile composition of every accepted station is
+provided as a data file,
+\texttt{station\_quartile\_distribution.csv} (1{,}045 rows), with the
+columns: station identifier, latitude, longitude, state, biome, record
+length, total event count, the event count and percentage in each
+quartile (Q1--Q4), and the dominant quartile. Table~\ref{tab:supp_quartile}
+shows one representative station per biome (the station with the longest
+event record in each) to illustrate the format and the range of
+compositions; the full distribution is summarised at biome level in
+Table~2 of the main text and mapped in Fig.~6.
+
+\begin{table}[h]
+  \centering
+  \caption{Event-quartile distribution for the longest-record station in
+    each biome (illustrative excerpt of the full per-station data file).
+    Q1--Q4 give the percentage of the station's events in each quartile;
+    the final column is the dominant (modal) quartile.}
+  \label{tab:supp_quartile}
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{lllrrrrrc}
+    \toprule
+    Station & State & Biome & $N$ events &
+      Q1 (\%) & Q2 (\%) & Q3 (\%) & Q4 (\%) & Dom. \\
+    \midrule
+    14100000 & AM & Amaz\^onia       & 777 & 55.0 & 16.2 & 15.4 & 13.4 & 1 \\
+    39540550 & PE & Caatinga         & 270 & 29.6 & 29.3 & 21.5 & 19.6 & 1 \\
+    27110000 & TO & Cerrado          & 511 & 55.6 & 19.2 & 13.9 & 11.4 & 1 \\
+    80360200 & SP & Mata Atl\^antica & 666 & 23.7 & 22.4 & 17.9 & 36.0 & 4 \\
+    74120700 & RS & Pampa            & 407 & 36.4 & 31.9 & 22.1 &  9.6 & 1 \\
+    66910000 & MS & Pantanal         & 385 & 46.0 & 23.6 & 17.9 & 12.5 & 1 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\bibliographystyle{elsarticle-harv}
+\bibliography{references}
+
+\end{document}

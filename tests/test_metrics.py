@@ -11,4 +11,5 @@ def test_kge_and_fitness_are_perfect_for_identical_curves():
     assert metrics.kge == 1.0
     assert metrics.rmse == 0.0
     assert metrics.mae == 0.0
+    assert metrics.d_max == 0.0
     assert metrics.n_valid == 10

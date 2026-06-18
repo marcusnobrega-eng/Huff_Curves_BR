@@ -13,6 +13,8 @@ def test_regional_huff_coefficients_use_station_median_curves():
             "state_name": ["Rondonia", "Rondonia"],
             "n_events": [10, 20],
             "years_span": [1.0, 2.0],
+            "mae_mean": [0.03, 0.04],
+            "d_max_mean": [0.07, 0.08],
             "kge_mean": [0.8, 0.9],
             "missing_fraction": [0.1, 0.2],
             "q1_n_events": [8, 10],

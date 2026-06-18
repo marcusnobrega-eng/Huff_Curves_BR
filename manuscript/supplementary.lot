@@ -1,0 +1,5 @@
+\contentsline {table}{\numberline {S1}{\ignorespaces Processing pipeline outcome for the 3{,}164 ANA telemetric stations. Quality filters applied simultaneously: record span $\geq $~4~yr; missing fraction $\leq $~20\%; no full-zero calendar year; maximum interval intensity $\leq $~300~mm~h$^{-1}$.}}{2}{table.1}%
+\contentsline {table}{\numberline {S2}{\ignorespaces Input datasets for the design-hydrograph experiment.}}{3}{table.2}%
+\contentsline {table}{\numberline {S3}{\ignorespaces Catchment eligibility criteria.}}{5}{table.3}%
+\contentsline {table}{\numberline {S4}{\ignorespaces Curve number (AMC II) by biome land cover and hydrologic soil group \citep {NRCS2004}.}}{5}{table.4}%
+\contentsline {table}{\numberline {S5}{\ignorespaces Event-quartile distribution for the longest-record station in each biome (illustrative excerpt of the full per-station data file). Q1--Q4 give the percentage of the station's events in each quartile; the final column is the dominant (modal) quartile.}}{8}{table.5}%
