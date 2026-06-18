@@ -70,15 +70,12 @@ button {
 }
 
 .brand-mark {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: #111315;
-  background: var(--accent);
-  font-weight: 800;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .brand strong,
@@ -906,7 +903,7 @@ span[data-tip] {
 
 .modal-card {
   position: relative;
-  width: min(480px, 100%);
+  width: min(720px, 100%);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 32px 28px 20px;
@@ -935,9 +932,7 @@ span[data-tip] {
 }
 
 .modal-step-icon {
-  font-size: 34px;
-  margin-bottom: 10px;
-  line-height: 1;
+  display: none;
 }
 
 .modal-title {
@@ -955,8 +950,7 @@ span[data-tip] {
 .modal-curves-svg {
   display: block;
   width: 100%;
-  max-width: 370px;
-  margin: 16px auto 0;
+  margin: 20px auto 0;
 }
 
 .modal-list {
