@@ -354,7 +354,9 @@ function renderSelectedCard(station) {
   setText('selectedSubtitle', stationPlace(station));
   setText('selectedQuartile', quartileLabel(station.dominant_quartile));
   setText('selectedEvents', fmt(station.n_events));
-  setText('selectedKge', fmtFixed(station.kge_mean, 3));
+  const maes = [1, 2, 3, 4].map((q) => (station.quartiles?.[String(q)] || {}).mae).filter((v) => v != null);
+  const mae_mean = maes.length ? maes.reduce((a, b) => a + b, 0) / maes.length : null;
+  setText('selectedKge', fmtFixed(mae_mean, 3));
 }
 
 function metadataItems(station) {
@@ -400,7 +402,7 @@ function renderQuartileTable(station) {
       <td>${fmtFixed(rec.avg_volume_mm, 1)} mm</td>
       <td>${fmtFixed(rec.avg_duration_h, 1)} h</td>
       <td>${fmtFixed(rec.max_intensity_mm_h, 1)} mm/h</td>
-      <td>${fmtFixed(rec.kge, 3)}</td>
+      <td>${fmtFixed(rec.mae, 3)}</td>
     `;
     body.appendChild(tr);
   }
@@ -970,7 +972,7 @@ function exportFilteredCsv() {
     'n_events',
     'years_span',
     'missing_fraction',
-    'kge_mean',
+    'mae_mean',
   ];
   const lines = [cols.join(',')];
   state.filtered.forEach((station) => {
@@ -986,6 +988,7 @@ function wireEvents() {
   });
   byId('fitAllButton').addEventListener('click', fitFiltered);
   byId('exportCsvButton').addEventListener('click', exportFilteredCsv);
+  byId('exportReportButton').addEventListener('click', exportStationReport);
   byId('shareButton').addEventListener('click', shareStation);
   byId('helpButton').addEventListener('click', openWelcomeModal);
   byId('downloadStormButton').addEventListener('click', downloadStormCsv);
@@ -1009,7 +1012,7 @@ function wireEvents() {
 
 // ── Info tooltip content ──────────────────────────────────────────────────
 const INFO_TIPS = {
-  kge: 'Kling–Gupta Efficiency (KGE): measures goodness-of-fit between the observed cumulative curve and the fitted polynomial. Ranges from −∞ to 1; closer to 1 is better.',
+  mae: 'Mean Absolute Error (MAE): average absolute deviation between the observed cumulative curve and the Huff reference curve. Lower values indicate a better fit.',
   dominant: 'Dominant quartile: the Q1–Q4 class with the most rainfall events at this station. Q1 = front-loaded (peak early); Q4 = back-loaded (peak late).',
   events: 'Number of independent sub-daily rainfall events extracted after quality control (minimum volume, duration, and inter-event separation thresholds applied).',
   curves: 'Dimensionless cumulative Huff curves. x-axis = fraction of storm duration (0→1); y-axis = fraction of total storm depth (0→1). Dashed band = 10th–90th percentile envelope for the active quartile.',
@@ -1076,6 +1079,284 @@ function shareStation() {
       .catch(() => { try { prompt('Copy this link:', url); } catch (e2) {} });
   } else {
     try { prompt('Copy this link:', url); } catch (e) {}
+  }
+}
+
+// ── Station report export (.docx) ─────────────────────────────────────────
+async function exportStationReport() {
+  const station = state.selected;
+  if (!station) { showToast('Select a station first.'); return; }
+  if (!window.docx) { showToast('Report library not loaded yet — try again shortly.'); return; }
+
+  showToast('Building report…');
+
+  const {
+    Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+    ImageRun, AlignmentType, BorderStyle, WidthType, ShadingType,
+    HeadingLevel, Footer, PageNumber,
+  } = window.docx;
+
+  // A4, 1-inch margins
+  const PAGE_W = 11906;
+  const PAGE_H = 16838;
+  const MARGIN = 1440;
+  const CW = PAGE_W - 2 * MARGIN; // 9026 DXA content width
+
+  const Q_HEX = { '1': 'E84D4F', '2': 'F4B63F', '3': '2CB7B0', '4': '7C5CFF' };
+  const Q_LABEL = { '1': '1st Quartile', '2': '2nd Quartile', '3': '3rd Quartile', '4': '4th Quartile' };
+  const BORDER = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
+  const BORDERS = { top: BORDER, bottom: BORDER, left: BORDER, right: BORDER };
+  const CM = { top: 80, bottom: 80, left: 120, right: 120 };
+
+  function hCell(text, w, opts = {}) {
+    const { align = AlignmentType.CENTER, fill = 'EEEEEE' } = opts;
+    return new TableCell({
+      width: { size: w, type: WidthType.DXA }, borders: BORDERS,
+      shading: { fill, type: ShadingType.CLEAR }, margins: CM,
+      children: [new Paragraph({
+        alignment: align,
+        children: [new TextRun({ text, bold: true, font: 'Arial', size: 18 })],
+      })],
+    });
+  }
+
+  function dCell(text, w, opts = {}) {
+    const { align = AlignmentType.CENTER, fill = null, color = '000000', bold = false } = opts;
+    const cell = new TableCell({
+      width: { size: w, type: WidthType.DXA }, borders: BORDERS, margins: CM,
+      children: [new Paragraph({
+        alignment: align,
+        children: [new TextRun({ text: String(text ?? '-'), font: 'Arial', size: 18, color, bold })],
+      })],
+    });
+    if (fill) cell.properties = { shading: { fill, type: ShadingType.CLEAR } };
+    return cell;
+  }
+
+  function qCell(q, w) {
+    return new TableCell({
+      width: { size: w, type: WidthType.DXA }, borders: BORDERS,
+      shading: { fill: Q_HEX[String(q)], type: ShadingType.CLEAR }, margins: CM,
+      children: [new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [new TextRun({ text: Q_LABEL[String(q)], bold: true, font: 'Arial', size: 18, color: 'FFFFFF' })],
+      })],
+    });
+  }
+
+  function sp(n = 200) { return new Paragraph({ spacing: { after: n }, children: [] }); }
+
+  function bodyText(text) {
+    return new Paragraph({
+      spacing: { after: 120 },
+      children: [new TextRun({ text, font: 'Arial', size: 20 })],
+    });
+  }
+
+  function h1(text) {
+    return new Paragraph({
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 400, after: 160 },
+      children: [new TextRun({ text, font: 'Arial', bold: true, size: 28, color: '111111' })],
+    });
+  }
+
+  // Chart image
+  let chartImage = null;
+  const curveChart = state.charts && state.charts['curveChart'];
+  if (curveChart) {
+    try {
+      const dataUrl = curveChart.canvas.toDataURL('image/png');
+      const b64 = dataUrl.split(',')[1];
+      const bin = atob(b64);
+      const buf = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      chartImage = new ImageRun({
+        type: 'png', data: buf.buffer,
+        transformation: { width: 500, height: 290 },
+        altText: { title: 'Huff Curves', description: 'Normalized cumulative Huff curves', name: 'huffcurves' },
+      });
+    } catch (e) { /* chart not ready */ }
+  }
+
+  // Metadata table (2 cols: 3000 | 6026)
+  const META_W = [3000, CW - 3000];
+  const metaItems = metadataItems(station).filter(([, v]) => v != null && String(v) !== '-');
+  const metaTable = new Table({
+    width: { size: CW, type: WidthType.DXA },
+    columnWidths: META_W,
+    rows: [
+      new TableRow({ children: [hCell('Property', META_W[0], { align: AlignmentType.LEFT }), hCell('Value', META_W[1], { align: AlignmentType.LEFT })] }),
+      ...metaItems.map(([label, value]) => new TableRow({
+        children: [
+          dCell(label, META_W[0], { align: AlignmentType.LEFT }),
+          dCell(String(value), META_W[1], { align: AlignmentType.LEFT }),
+        ],
+      })),
+    ],
+  });
+
+  // Quartile stats table (6 cols: 1402 | 1525×4 | 1524)
+  const STAT_W = [1402, 1525, 1525, 1525, 1525, 1524];
+  const statsTable = new Table({
+    width: { size: CW, type: WidthType.DXA },
+    columnWidths: STAT_W,
+    rows: [
+      new TableRow({ children: [
+        hCell('Quartile', STAT_W[0]),
+        hCell('Events (share)', STAT_W[1]),
+        hCell('Avg. Volume (mm)', STAT_W[2]),
+        hCell('Avg. Duration (h)', STAT_W[3]),
+        hCell('Peak intensity (mm/h)', STAT_W[4]),
+        hCell('MAE', STAT_W[5]),
+      ] }),
+      ...[1, 2, 3, 4].map((q) => {
+        const rec = (station.quartiles && station.quartiles[String(q)]) || {};
+        return new TableRow({ children: [
+          qCell(q, STAT_W[0]),
+          dCell(rec.n_events != null ? `${fmt(rec.n_events)} (${fmtPercentValue(rec.percent_events, 1)}%)` : '-', STAT_W[1]),
+          dCell(rec.avg_volume_mm != null ? `${fmtFixed(rec.avg_volume_mm, 1)}` : '-', STAT_W[2]),
+          dCell(rec.avg_duration_h != null ? `${fmtFixed(rec.avg_duration_h, 1)}` : '-', STAT_W[3]),
+          dCell(rec.max_intensity_mm_h != null ? `${fmtFixed(rec.max_intensity_mm_h, 1)}` : '-', STAT_W[4]),
+          dCell(rec.mae != null ? fmtFixed(rec.mae, 3) : '-', STAT_W[5]),
+        ] });
+      }),
+    ],
+  });
+
+  // Coefficient table (9 cols: 1402 | 953×8)
+  const COEF_W = [1402, ...Array(8).fill(953)]; // 1402 + 953*8 = 9026
+  const coeffTable = new Table({
+    width: { size: CW, type: WidthType.DXA },
+    columnWidths: COEF_W,
+    rows: [
+      new TableRow({ children: [
+        hCell('Quartile', COEF_W[0]),
+        ...[1, 2, 3, 4, 5, 6, 7, 8].map((i) => hCell(`c${i}`, COEF_W[i])),
+      ] }),
+      ...[1, 2, 3, 4].map((q) => {
+        const rec = (station.quartiles && station.quartiles[String(q)]) || {};
+        const coeffs = rec.coefficients || Array(8).fill(null);
+        return new TableRow({ children: [
+          qCell(q, COEF_W[0]),
+          ...coeffs.slice(0, 8).map((c, i) => dCell(c != null ? c.toFixed(6) : '-', COEF_W[i + 1])),
+        ] });
+      }),
+    ],
+  });
+
+  const domQ = station.dominant_quartile;
+  const domDesc = { 1: 'front-loaded (peak in the first quarter)', 2: 'early front-loaded (peak in the second quarter)', 3: 'late back-loaded (peak in the third quarter)', 4: 'back-loaded (peak in the final quarter)' };
+  const dateStr = new Date().toISOString().split('T')[0];
+
+  const doc = new Document({
+    styles: {
+      default: { document: { run: { font: 'Arial', size: 20 } } },
+      paragraphStyles: [
+        { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true,
+          run: { size: 28, bold: true, font: 'Arial', color: '111111' },
+          paragraph: { spacing: { before: 400, after: 160 }, outlineLevel: 0 } },
+      ],
+    },
+    sections: [{
+      properties: {
+        page: { size: { width: PAGE_W, height: PAGE_H }, margin: { top: MARGIN, right: MARGIN, bottom: MARGIN, left: MARGIN } },
+      },
+      footers: {
+        default: new Footer({ children: [new Paragraph({
+          alignment: AlignmentType.CENTER,
+          children: [
+            new TextRun({ text: `Huff Curves BR Atlas  |  Station ${station.station_id}  |  Page `, font: 'Arial', size: 16, color: '888888' }),
+            new TextRun({ children: [PageNumber.CURRENT], font: 'Arial', size: 16, color: '888888' }),
+          ],
+        })] }),
+      },
+      children: [
+        // Title block
+        new Paragraph({
+          spacing: { after: 80 },
+          children: [new TextRun({ text: 'HUFF CURVES STATION REPORT', font: 'Arial', size: 40, bold: true, color: '36C5A3' })],
+        }),
+        new Paragraph({
+          spacing: { after: 60 },
+          children: [new TextRun({ text: `Station ${station.station_id}`, font: 'Arial', size: 32, bold: true }), new TextRun({ text: `  —  ${station.municipality_name || ''}, ${station.state_name || station.state_abbrev || ''}`, font: 'Arial', size: 28 })],
+        }),
+        new Paragraph({
+          spacing: { after: 280 },
+          border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: '36C5A3', space: 1 } },
+          children: [new TextRun({ text: `${station.biome_name || ''}   |   ${station.region_name || ''}   |   Generated: ${dateStr}`, font: 'Arial', size: 18, color: '888888' })],
+        }),
+
+        // 1. Station Metadata
+        h1('1. Station Metadata'),
+        metaTable,
+        sp(300),
+
+        // 2. Quartile Statistics
+        h1('2. Quartile Statistics'),
+        bodyText(`The dominant quartile at this station is ${Q_LABEL[String(domQ)] || `Q${domQ}`}, meaning the majority of rainfall events exhibit a ${domDesc[domQ] || ''} temporal distribution.`),
+        sp(120),
+        statsTable,
+        sp(300),
+
+        // 3. Normalized Huff Curves
+        h1('3. Normalized Huff Curves'),
+        bodyText('The figure below shows the dimensionless cumulative Huff curves for each quartile (Q1–Q4), computed as the bootstrap median of all classified storm events at this station. The dashed band represents the 10th–90th percentile envelope of the dominant quartile. The x-axis represents normalized storm time (t / T) and the y-axis represents the cumulative rainfall fraction (P / Pᵀ).'),
+        sp(80),
+        ...(chartImage
+          ? [new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [chartImage] })]
+          : [bodyText('[Curves chart not available — ensure the station curves are loaded before exporting.]')]),
+        sp(300),
+
+        // 4. Polynomial Coefficients
+        h1('4. Polynomial Coefficients'),
+        bodyText('Each Huff curve is approximated by an 8th-degree polynomial that maps normalized storm time t ∈ [0, 1] to cumulative rainfall fraction:'),
+        new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 100, after: 100 },
+          children: [new TextRun({ text: 'P / Pᵀ = c₁ t⁷ + c₂ t⁶ + c₃ t⁵ + c₄ t⁴ + c₅ t³ + c₆ t² + c₇ t + c₈', font: 'Arial', size: 20, italics: true })],
+        }),
+        bodyText('Coefficients for each quartile, fitted to the bootstrap median curve, are given in the table below.'),
+        sp(80),
+        coeffTable,
+        sp(300),
+
+        // 5. Methodology
+        h1('5. Methodology'),
+        bodyText('Huff curves are dimensionless cumulative mass curves that characterize the temporal distribution of rainfall within a storm event. Each event is classified into one of four quartiles (Q1–Q4) according to the normalized time at which peak intensity occurs: Q1 events concentrate the majority of rainfall in the first quarter of the storm duration (front-loaded), while Q4 events release most rainfall near the end (back-loaded).'),
+        sp(80),
+        bodyText('Storm events were extracted from sub-daily rainfall records using an inter-event time definition (IETD) criterion, with minimum thresholds applied for event volume and duration to ensure data quality. For each station, events were classified by quartile, and the bootstrap median of the normalized cumulative mass curves was computed across 1000 resamples to obtain a robust central estimate along with 10th–90th percentile uncertainty bounds.'),
+        sp(80),
+        bodyText('The Mean Absolute Error (MAE) measures the average absolute deviation between the observed cumulative curve and the fitted Huff reference curve, where lower values indicate better agreement.'),
+        sp(300),
+
+        // Citation
+        new Paragraph({
+          spacing: { after: 60 },
+          border: { top: { style: BorderStyle.SINGLE, size: 2, color: 'CCCCCC', space: 1 } },
+          children: [new TextRun({ text: 'Reference: Gomes Junior, M.N. et al. (in prep.). Regional Huff curves for Brazil derived from high-density rain gauge networks. Journal of Hydrology.', font: 'Arial', size: 18, italics: true, color: '666666' })],
+        }),
+        new Paragraph({
+          children: [new TextRun({ text: `Generated by Huff Curves BR Atlas  |  ${dateStr}  |  https://github.com/mngomes/Huff_Curves_BR`, font: 'Arial', size: 16, color: 'AAAAAA' })],
+        }),
+      ],
+    }],
+  });
+
+  try {
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `huff_station_${station.station_id}.docx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast('Report downloaded.');
+  } catch (err) {
+    console.error('DOCX export failed:', err);
+    showToast('Export failed — see browser console for details.');
   }
 }
 

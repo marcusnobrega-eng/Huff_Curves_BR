@@ -10,7 +10,28 @@
   <body>
     <header class="topbar">
       <a class="brand" href="#">
-        <span class="brand-mark">H</span>
+        <span class="brand-mark">
+          <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-label="Huff Curves BR logo">
+            <defs><clipPath id="bc"><circle cx="22" cy="22" r="19"/></clipPath></defs>
+            <circle cx="22" cy="22" r="19" fill="#0b1520"/>
+            <g clip-path="url(#bc)">
+              <path d="M15.5,21.4L17.0,21.9L17.2,23.8L18.7,23.8L18.9,28.3L20.6,28.4L21.8,29.8L22.2,32.0L19.2,34.5L23.0,36.0L22.5,37.2L24.1,34.4L24.6,34.7L23.5,36.0L26.0,33.2L26.8,30.4L32.0,28.2L33.4,24.9L33.6,21.4L36.5,18.1L36.6,16.3L32.8,13.5L29.2,13.6L29.0,12.3L26.2,11.9L24.9,11.0L23.8,7.8L22.8,9.6L20.5,9.3L18.3,10.4L17.3,7.2L15.1,8.5L13.7,8.0L14.8,9.6L13.2,10.7L11.7,9.5L9.8,9.9L9.7,14.5L7.4,15.2L6.6,17.1L8.0,19.0L9.3,18.5L9.2,19.7L13.2,18.7L13.5,20.5L15.4,21.3Z"
+                    fill="#0f2236" stroke="rgba(255,255,255,.28)" stroke-width=".5" stroke-linejoin="round"/>
+              <circle cx="17.3" cy="13.6" r="1.3" fill="#e84d4f" opacity=".9"/>
+              <circle cx="26.2" cy="12.4" r="1.3" fill="#7c5cff" opacity=".9"/>
+              <circle cx="33.9" cy="14.1" r="1.3" fill="#e84d4f" opacity=".9"/>
+              <circle cx="36.7" cy="17.5" r="1.3" fill="#f4b63f" opacity=".9"/>
+              <circle cx="26.7" cy="23.4" r="1.3" fill="#36c5a3" opacity=".9"/>
+              <circle cx="29.7" cy="26.6" r="1.3" fill="#7c5cff" opacity=".9"/>
+              <circle cx="30.3" cy="28.9" r="1.3" fill="#2cb7b0" opacity=".9"/>
+              <circle cx="27.7" cy="29.4" r="1.3" fill="#36c5a3" opacity=".9"/>
+              <circle cx="14.4" cy="18.0" r="1.3" fill="#2cb7b0" opacity=".9"/>
+              <circle cx="24.1" cy="34.4" r="1.3" fill="#f4b63f" opacity=".9"/>
+            </g>
+            <circle cx="22" cy="22" r="20" fill="none" stroke="rgba(54,197,163,.18)" stroke-width="3"/>
+            <circle cx="22" cy="22" r="18.5" fill="none" stroke="#36c5a3" stroke-width="1.2"/>
+          </svg>
+        </span>
         <span>
           <strong>Huff Curves BR Atlas</strong>
           <small>ANA sub-daily rainfall stations</small>
@@ -109,7 +130,7 @@
           <div class="metric-row">
             <div><span data-tip="dominant">Dominant</span><strong id="selectedQuartile">-</strong></div>
             <div><span data-tip="events">Events</span><strong id="selectedEvents">-</strong></div>
-            <div><span data-tip="kge">KGE</span><strong id="selectedKge">-</strong></div>
+            <div><span data-tip="mae">MAE</span><strong id="selectedKge">-</strong></div>
           </div>
         </section>
 
@@ -127,8 +148,11 @@
 
         <section id="stationPanel" class="panel-view active">
           <div class="section-head">
-            <h2 id="stationHeading">Station</h2>
-            <span id="stationLocation">-</span>
+            <div>
+              <h2 id="stationHeading">Station</h2>
+              <span id="stationLocation">-</span>
+            </div>
+            <button class="download-btn" id="exportReportButton" type="button" title="Export station report as Word document">↓ DOCX</button>
           </div>
 
           <dl class="metadata-grid" id="metadataGrid"></dl>
@@ -154,7 +178,7 @@
                     <th>Volume</th>
                     <th>Duration</th>
                     <th>Peak</th>
-                    <th>KGE</th>
+                    <th>MAE</th>
                   </tr>
                 </thead>
                 <tbody id="quartileTable"></tbody>
@@ -310,31 +334,35 @@
 
         <!-- Step 0: What are Huff curves -->
         <div class="modal-step" id="welcomeStep0">
-          <div class="modal-step-icon">🌧</div>
           <h2 class="modal-title" id="welcomeModalTitle">Brazil's first empirical Huff atlas</h2>
           <p class="modal-body">Huff (1967) curves classify storms by <em>when</em> peak intensity occurs.
             <strong style="color:var(--q1)">Q1</strong> is front-loaded (peaks early);
             <strong style="color:var(--q4)">Q4</strong> is back-loaded (peaks late).
             This atlas was derived from thousands of ANA sub-daily gauge records across all six Brazilian biomes.</p>
-          <svg class="modal-curves-svg" viewBox="0 0 224 132" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <line x1="16" y1="116" x2="212" y2="116" stroke="#303741" stroke-width="1.2"/>
-            <line x1="16" y1="16" x2="16" y2="116" stroke="#303741" stroke-width="1.2"/>
-            <line x1="16" y1="116" x2="212" y2="16" stroke="#303741" stroke-width="0.8" stroke-dasharray="4 4"/>
-            <path d="M 16,116 C 64,28 136,16 212,16" stroke="#e84d4f" fill="none" stroke-width="2.2"/>
-            <path d="M 16,116 C 82,56 148,24 212,16" stroke="#f4b63f" fill="none" stroke-width="2.2"/>
-            <path d="M 16,116 C 92,90 160,40 212,16" stroke="#2cb7b0" fill="none" stroke-width="2.2"/>
-            <path d="M 16,116 C 114,106 176,60 212,16" stroke="#7c5cff" fill="none" stroke-width="2.2"/>
-            <text x="70" y="42" fill="#e84d4f" font-size="9" font-family="system-ui,sans-serif">Q1</text>
-            <text x="102" y="58" fill="#f4b63f" font-size="9" font-family="system-ui,sans-serif">Q2</text>
-            <text x="138" y="78" fill="#2cb7b0" font-size="9" font-family="system-ui,sans-serif">Q3</text>
-            <text x="162" y="98" fill="#7c5cff" font-size="9" font-family="system-ui,sans-serif">Q4</text>
-            <text x="114" y="130" fill="#7f8a91" font-size="8" font-family="system-ui,sans-serif" text-anchor="middle">Normalized time →</text>
+          <svg class="modal-curves-svg" viewBox="0 0 240 148" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- axes -->
+            <line x1="28" y1="128" x2="228" y2="128" stroke="#303741" stroke-width="1.2"/>
+            <line x1="28" y1="12"  x2="28"  y2="128" stroke="#303741" stroke-width="1.2"/>
+            <!-- 1:1 reference -->
+            <line x1="28" y1="128" x2="228" y2="12" stroke="#303741" stroke-width="0.8" stroke-dasharray="4 4"/>
+            <!-- Huff curves -->
+            <path d="M 28,128 C 76,40 148,12 228,12" stroke="#e84d4f" fill="none" stroke-width="2.2"/>
+            <path d="M 28,128 C 94,68 160,24 228,12" stroke="#f4b63f" fill="none" stroke-width="2.2"/>
+            <path d="M 28,128 C 106,102 172,48 228,12" stroke="#2cb7b0" fill="none" stroke-width="2.2"/>
+            <path d="M 28,128 C 128,118 192,68 228,12" stroke="#7c5cff" fill="none" stroke-width="2.2"/>
+            <!-- labels -->
+            <text x="82"  y="50"  fill="#e84d4f" font-size="9" font-family="system-ui,sans-serif">Q1</text>
+            <text x="116" y="68"  fill="#f4b63f" font-size="9" font-family="system-ui,sans-serif">Q2</text>
+            <text x="152" y="88"  fill="#2cb7b0" font-size="9" font-family="system-ui,sans-serif">Q3</text>
+            <text x="178" y="108" fill="#7c5cff" font-size="9" font-family="system-ui,sans-serif">Q4</text>
+            <!-- axis labels -->
+            <text x="128" y="143" fill="#7f8a91" font-size="8" font-family="system-ui,sans-serif" text-anchor="middle">Normalized time →</text>
+            <text x="8"   y="70"  fill="#7f8a91" font-size="8" font-family="system-ui,sans-serif" text-anchor="middle" transform="rotate(-90 8 70)">Normalized precipitation →</text>
           </svg>
         </div>
 
         <!-- Step 1: Explore the map -->
         <div class="modal-step" id="welcomeStep1" hidden>
-          <div class="modal-step-icon">🗺</div>
           <h2 class="modal-title">Explore the map</h2>
           <ul class="modal-list">
             <li>Dot <span class="modal-accent">color</span> shows the dominant quartile at each station; <span class="modal-accent">dot size</span> scales with event count.</li>
@@ -343,13 +371,11 @@
           </ul>
         </div>
 
-        <!-- Step 2: Design storms + keyboard shortcuts -->
+        <!-- Step 2: Design storms -->
         <div class="modal-step" id="welcomeStep2" hidden>
-          <div class="modal-step-icon">⚡</div>
-          <h2 class="modal-title">Build design storms &amp; share</h2>
+          <h2 class="modal-title">Build design storms</h2>
           <ul class="modal-list">
             <li>Under <span class="modal-accent">Design Storm</span> in the right panel, set storm <span class="modal-accent">duration</span>, total <span class="modal-accent">volume</span>, and <span class="modal-accent">time step</span> — then download the hyetograph as CSV.</li>
-            <li>Hit <span class="modal-accent">Share</span> in the top bar to copy a direct link to the current station.</li>
             <li>Keyboard shortcuts: <kbd>/</kbd> focus search &nbsp;·&nbsp; <kbd>↑↓</kbd> navigate stations &nbsp;·&nbsp; <kbd>?</kbd> reopen this guide</li>
           </ul>
           <label class="modal-dont-show">
@@ -379,7 +405,8 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
     <script src="data/bootstrap.js"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=6"></script>
   </body>
 </html>
