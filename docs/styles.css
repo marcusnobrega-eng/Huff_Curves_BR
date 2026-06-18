@@ -820,6 +820,20 @@ details summary {
   color: var(--text);
 }
 
+#exportReportButton {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #101214;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+#exportReportButton:hover {
+  background: #29b093;
+  border-color: #29b093;
+  color: #101214;
+}
+
 /* ── Topbar icon button (Share / Help) ───────────────────────────────────── */
 .icon-button {
   width: 38px;
